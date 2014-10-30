@@ -68,8 +68,3 @@ bower_components
 complexity.bin
 complexity.bin.lock
 
-# Static
-complexity/static/.webassets-cache
-complexity/static/all.*
-
-
