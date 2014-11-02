@@ -16,6 +16,8 @@ import os
 from flask import Flask, render_template
 from flask.ext import shelve, assets
 
+from quiz import quiz
+
 # Configuration
 SHELVE_FILENAME = 'complexity.bin'
 
@@ -54,14 +56,16 @@ env.register(
 env.register(
     'css_all',
     assets.Bundle(
-        'bootstrap/less/bootstrap.less',
         'all.less',
         filters='less',
-        output='all.css'
+        output='all.css',
+        depends=['**/*.less']
     )
 )
 
 @app.route("/")
 def index():
     return render_template('index.html')
+
+app.register_blueprint(quiz, url_prefix="/quiz")
 
