@@ -13,7 +13,8 @@ import uuid
 from pkgutil import iter_modules
 from flask.ext.assets import Bundle
 
-SHELVE_QUIZ_INSTANCE_PREFIX = 'quiz-'
+SHELVE_INSTANCE_PREFIX = 'quiz-'
+COOKIE_INSTANCE_KEY = 'quiz'
 
 # Get the quizes package's path.
 quizes_path = os.path.dirname(__file__)
@@ -77,6 +78,14 @@ def load_quiz(quiz_module):
 
     return Quiz
 
+def delete_instance():
+    pass
+
+def add_instance(instance_id):
+    pass
+
+def get_instance():
+    pass
 
 class BaseQuiz(object):
     """
@@ -112,7 +121,7 @@ class BaseQuiz(object):
         Returns:
             quiz (BaseQuiz): Quiz instance.
         """
-        return shelve[SHELVE_QUIZ_INSTANCE_PREFIX + id_]
+        return shelve[SHELVE_INSTANCE_PREFIX + id_]
 
     def id(self, shelve):
         """
@@ -129,7 +138,7 @@ class BaseQuiz(object):
             return self._id
         
         new_id = str(uuid.uuid4())
-        full_id = SHELVE_QUIZ_INSTANCE_PREFIX + new_id
+        full_id = SHELVE_INSTANCE_PREFIX + new_id
 
         # If ID already used just generate another.
         if full_id in shelve:
@@ -154,6 +163,6 @@ class BaseQuiz(object):
             str: The Quiz instance's ID.
         """
         id_ = self.id(shelve)
-        shelve[SHELVE_QUIZ_INSTANCE_PREFIX + id_] = self
+        shelve[SHELVE_INSTANCE_PREFIX + id_] = self
         return id_
         

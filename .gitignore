@@ -68,3 +68,6 @@ bower_components
 complexity.bin
 complexity.bin.lock
 
+# Crypto Secrets.
+complexity/secrets.py
+
