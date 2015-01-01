@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Attempting {{ quiz_name }}... {% endblock %}
+
+
+{% block header %}
+    <div id="quiz-details" class="row">
+        <div class="col-md-6">
+            <h2 id="quiz-name">Quiz: {{ quiz_name }}</h2>
+        </div>
+
+        <div class"col-md-6">
+            <h2 id="quiz-score pull-right">Score: <span id="quiz-score-int">0</span></h2>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+  <div id="quiz-content">
+    {% block quiz_content %}
+        <div class="center vcenter">
+            <h1>Warming up.....</h1>
+        </div>
+    {% endblock %}
+  </div>
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    {% assets "quiz" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endblock %}
+

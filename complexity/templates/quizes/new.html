@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %} Starting a quiz... {% endblock %}
+{% block title %} Select a quiz! {% endblock %}
 
 {% block content %}
-  <div class="quiz-content">
+  <div class="center vcenter">
       <h1>Please select a quiz: </h1>
       <form class="form-inline row">
           <div class="form-group">
           <select name="quiz" class="input-lg">
-              <option>The Modulus</option>
-              <option>The Complex Plane</option>
+          {% for name, module in quizes.iteritems() %}
+              <option value="{{ module }}">{{name}}</option>
+          {% endfor %}
           </select>
           </div>
           

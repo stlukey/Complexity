@@ -37,7 +37,7 @@
                     </button>
                     
                     <!-- Project Title -->
-                    <a class="navbar-brand" href="#">Complexity</a>
+                    <a class="navbar-brand" href="{{ url_for('index') }}">Complexity</a>
                 </div>
 
                 <!-- Navbar links -->
@@ -50,13 +50,19 @@
         </div>
     </nav>
 
-    <div class="container center">
+    <header id="header">
+        {% block header %}{% endblock %}
+    </header>
+
+    <div id="content">
         {% block content %}{% endblock %}
     </div>
-
-    {% assets "js_all" %}
-        <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
+    
+    {% block js %}
+        {% assets "js_all" %}
+            <script src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+    {% endblock %}
     
 </body>
 </html>

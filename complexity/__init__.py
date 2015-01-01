@@ -10,7 +10,6 @@
     :license: New BSD, see LICENSE for more details.
 """
 
-
 import os
 
 from flask import Flask, render_template
@@ -27,7 +26,6 @@ app.config.from_object(__name__)
 
 # Set up the shelve
 shelve.init_app(app)
-
 
 # Set up flask Assets
 env = assets.Environment(app)
@@ -50,6 +48,17 @@ env.register(
             filters=['coffeescript']
         ),
         output='all.js'
+    )
+)
+
+env.register(
+    'quiz',
+    assets.Bundle(
+        assets.Bundle(
+            'quiz.coffee',
+            filters=['coffeescript']
+        ),
+        output='quiz.js'
     )
 )
 

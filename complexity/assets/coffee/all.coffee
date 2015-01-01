@@ -1,5 +1,12 @@
+##!/usr/bin/env coffee
+# -*- coding: UTF-8 -*-
 ###
-Complexity core coffee script.
+    Complexity: all.coffee
+    ~~~~~~~~~~~~~~~~~~~~~~
+    Core coffee script.
+
+    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :license: New BSD, see LICENSE for more details.
 ###
 
 class Complexity
