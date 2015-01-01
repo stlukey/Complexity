@@ -27,7 +27,7 @@
 
 {% block js %}
     {{ super() }}
-    {% assets "quiz" %}
+    {% assets "quiz-" + quiz_module %}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 {% endblock %}

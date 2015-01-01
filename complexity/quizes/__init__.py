@@ -9,57 +9,151 @@
 """
 
 import os
-from pkgutil import iter_modules
-
 import uuid
+from pkgutil import iter_modules
+from flask.ext.assets import Bundle
+
+SHELVE_QUIZ_INSTANCE_PREFIX = 'quiz-'
 
 # Get the quizes package's path.
 quizes_path = os.path.dirname(__file__)
 
 # Find all quiz modules.
-quiz_modules = [module for _, module, _ in iter_modules([quizes_path])]
+quiz_modules = [
+    module for _, module, _ in iter_modules([quizes_path])
+]
 
 # Create name (replace '_' with spaces and make title case).
-quiz_names = [module.replace('_', ' ').title() for module in quiz_modules]
+quiz_names = [
+    module.replace('_', ' ').title() for module in quiz_modules
+]
 
 # Generate dictionary of quizes and there names.
-quizes = {name:module for name in quiz_names for module in quiz_modules}
+quizes = {
+    name:module
+        for name in quiz_names
+            for module in quiz_modules
+}
 
 # For reverse lookup.
 quizes_rev = {v: k for k, v in quizes.items()}
 
+def register_assets(assets):
+    """
+    Create and register assets for every quiz.
+    (cant relative import assets?)
+
+    Args:
+        assets (Environment): Flask-Assets Environment.
+    """
+    for module in quiz_modules:
+        assets.register(
+            'quiz-' + module,
+            Bundle(
+                Bundle(
+                    'quizes/{}.coffee'.format(module),
+                    filters=['coffeescript']
+                ),
+                output='quiz-{}.js'.format(module)
+            )
+        )
+
+def load_quiz(quiz_module):
+    """
+    Load Quiz class for given module.
+    
+    Args:
+        quiz_module (str): Name of module that contains `Quiz` class
+                           in the package `quizes`.
+
+    Returns:
+        Quiz (BaseQuiz): The `Quiz` class from `quiz_module`.
+
+    """
+
+    # TODO: Load dynamicallly based on `quiz_modulus` once more than
+    #       one quiz exists.
+    from the_modulus import Quiz
+
+    return Quiz
+
 
 class BaseQuiz(object):
+    """
+    Base Quiz object that all Quiz objects MUST inherit from.
+
+    Attributes:
+       _id (str): Private, access via `self.id` method.
+    """
+
     @classmethod
-    def create_new(cls, shelves):
-        return cls().save(shelves)
+    def create_new(cls, shelve):
+        """
+        Create new instance of `cls` and save in shelve.
+
+        Args:
+            cls (BaseQuiz): The Quiz class.
+            shelve (Shelve): The open shelve (file) from flask-shelves. 
+
+        Returns:
+            str: The Quiz instance's ID.
+        """
+        return cls().save(shelve)
 
     @staticmethod
-    def get(shelves, id_):
-        return shelves[id_]
+    def get_instance(shelve, id_):
+        """
+        Get instance from the shelve file.
 
-    def id(self, shelves):
+        Args:
+            shelve (Shelve): The open shelve (file) from flask-shelves.
+            id_ (str): The Quiz instance's ID.
+
+        Returns:
+            quiz (BaseQuiz): Quiz instance.
+        """
+        return shelve[SHELVE_QUIZ_INSTANCE_PREFIX + id_]
+
+    def id(self, shelve):
+        """
+        Find or create and claim ID for instance.
+
+        Args:
+            shelve (Shelve): The open shelve (file) from flask-shelve.
+
+        Returns:
+            str: The Quiz instance's ID.
+        """
+
         if hasattr(self, '_id'):
             return self._id
         
-        new_id = "quiz-{}".format(str(uuid.uuid4()))
+        new_id = str(uuid.uuid4())
+        full_id = SHELVE_QUIZ_INSTANCE_PREFIX + new_id
 
         # If ID already used just generate another.
-        if new_id in shelves:
-            return self.id(shelves)
+        if full_id in shelve:
+            return self.id(shelve)
 
         # Claim the ID.
-        shelves[new_id] = None
+        shelve[full_id] = None
         
         # Save it for next time.
         self._id = new_id
 
         return new_id
 
+    def save(self, shelve):
+        """
+        Save instance.
 
-    def save(self, shelves):
-        shelves[self.id(shelves)] = self
-        return self.id(shelves)
-        
-        
+        Args:
+            shelve (Shelve): The open shelve (file) from flask-shelve.
 
+        Returns:
+            str: The Quiz instance's ID.
+        """
+        id_ = self.id(shelve)
+        shelve[SHELVE_QUIZ_INSTANCE_PREFIX + id_] = self
+        return id_
+        

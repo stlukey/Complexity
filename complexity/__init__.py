@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/assets python2
 # -*- coding: UTF-8 -*-
 """
     Complexity: Flask app
@@ -13,37 +13,61 @@
 import os
 
 from flask import Flask, render_template
-from flask.ext import shelve, assets
+from flask.ext import shelve
+from flask.ext.assets import Bundle, Environment
+
+from quizes import register_assets as register_quizes_assets
 
 from quiz import quiz
 
-# Configuration
+# NOTE: Idealy either a JSON file or a file containing a pickled
+#       Python dictionary would be used for storage as the storage
+#       required is not significant enough for a database. However
+#       the problem is multiple users could access the file at
+#       the same time and some may need to write data at the same
+#       time too. Python has a built-in module called 'shelves'
+#       that builds ontop of the 'pickle' module allowing for a
+#       layer of abstraction, eliminating the need to manually write
+#       the pickled data to the file. 'flask-shelves' is a
+#       reimplementaion of the built-in 'shelves' module for use
+#       with the Flask web framework and provides a locking
+#       mechanism over the pickled data file. Hence, this is why it
+#       is used for storage.
+
+
+####### Configuration #######
+
+# Data filename.
 SHELVE_FILENAME = 'complexity.bin'
 
-# Set up Flask app instance.
+# Assets directory.
+ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')
+
+########### Setup ###########
+
+# Flask app instance.
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-# Set up the shelve
+# The shelve.
 shelve.init_app(app)
 
-# Set up flask Assets
-env = assets.Environment(app)
+# Flask Assets.
+assets = Environment(app)
 
-# Tell flask-assets where to look for our coffeescript and sass files.
-ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')
+########## Assets ###########
 
-env.load_path = [
+assets.load_path = [
     os.path.join(ASSETS_PATH, path)
         for path in ['less', 'coffee', 'bower_components']
 ]
 
-env.register(
+assets.register(
     'js_all',
-    assets.Bundle(
+    Bundle(
         'jquery/dist/jquery.min.js',
         'bootstrap/dist/js/bootstrap.min.js',
-        assets.Bundle(
+        Bundle(
             'all.coffee',
             filters=['coffeescript']
         ),
@@ -51,20 +75,9 @@ env.register(
     )
 )
 
-env.register(
-    'quiz',
-    assets.Bundle(
-        assets.Bundle(
-            'quiz.coffee',
-            filters=['coffeescript']
-        ),
-        output='quiz.js'
-    )
-)
-
-env.register(
+assets.register(
     'css_all',
-    assets.Bundle(
+    Bundle(
         'all.less',
         filters='less',
         output='all.css',
@@ -72,9 +85,18 @@ env.register(
     )
 )
 
+register_quizes_assets(assets)
+
+#############################
+
 @app.route("/")
 def index():
+    """
+    The index page.
+    Just welcomes the user and asks them to start a quiz. 
+    """
     return render_template('index.html')
 
+# Register blueprints.
 app.register_blueprint(quiz, url_prefix="/quiz")
 
