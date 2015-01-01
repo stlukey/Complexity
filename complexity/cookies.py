@@ -15,13 +15,11 @@ import hmac
 try:
     from secrets import COOKIE_SECRET as SECRET
 except ImportError:
-    print "Critical Error: Can't load cookie secret from secrets.py."
+    print "Critical Error: Can't load COOKIE_SECRET from secrets.py"
     print "                (Did you remember to create the file?"
     print "                 It's not in the source code repository!)"
     import sys
     sys.exit(1)
-
-# SECRET = '' # base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
 
 class Cookie(object):
     """
@@ -46,9 +44,12 @@ class Cookie(object):
         if new or data is None:
             self.data = data
         else:
-            self.data, self._hash = data.split('|')
-            if self != Cookie(self.data):
+            if data.find('|') == -1:
                 self.data = None
+            else:
+                self.data, self._hash = data.split('|')
+                if self != Cookie(self.data):
+                    self.data = None
 
     @property
     def hash(self):

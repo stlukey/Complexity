@@ -19,6 +19,7 @@ from flask.ext.assets import Bundle, Environment
 from quizes import register_assets as register_quizes_assets
 
 from quiz import quiz
+from utils import get_shelve
 
 # NOTE: Idealy either a JSON file or a file containing a pickled
 #       Python dictionary would be used for storage as the storage
@@ -96,6 +97,11 @@ def index():
     Just welcomes the user and asks them to start a quiz. 
     """
     return render_template('index.html')
+
+# TODO: Remove for release.
+@app.route("/shelve")
+def show_shelve():
+    return str(dict(get_shelve()))
 
 # Register blueprints.
 app.register_blueprint(quiz, url_prefix="/quiz")

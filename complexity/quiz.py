@@ -9,15 +9,78 @@
     Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
     License: New BSD, see LICENSE for more details.
 """
+from functools import wraps
 
-from flask import Blueprint, render_template, request, redirect, url_for, abort
+from flask import (Blueprint, render_template, request, redirect,
+                   url_for, abort, g, make_response)
 from flask.ext import shelve
 
-from quizes import quizes, quizes_rev, quizes_path, load_quiz, register_assets
+from cookies import Cookie
+
+from utils import get_shelve
+from quizes import quizes, quizes_rev, quizes_path, load_quiz, BaseQuiz
+
+COOKIE_QUIZ = 'quiz'
 
 quiz = Blueprint('quiz', __name__, template_folder='templates/quizes')
 
+def quiz_cookie_manage(response):
+    """
+    Manages quiz instances set at g.quiz_id
+
+    Used by controllers with @after_request.
+    """
+    quiz_req = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
+
+    quiz_resp = None
+    if hasattr(g, 'quiz_id'):
+        quiz_resp = g.quiz_id
+    
+    # No more instances.
+    if quiz_resp is None:
+        if quiz_req is None:
+            # There wasn't any instances. Still aren't.
+            return
+        
+        # The instance did not get renewed.
+        try:
+            BaseQuiz.remove_instance(get_shelve('c'), quiz_req)
+        except KeyError:
+            pass
+        return response.set_cookie(COOKIE_QUIZ, '', expires=0)
+    
+    # Still an instance, but not the same as before (may not have
+    # been one before).
+    if quiz_resp != quiz_req:
+        if quiz_req is not None:
+            # Old instance has been replaced.
+            try:
+                BaseQuiz.remove_instance(get_shelve('c'), quiz_req)
+            except KeyError:
+                pass
+
+        # A new instance has been created.
+        return response.set_cookie(COOKIE_QUIZ, Cookie(quiz_resp).value)
+    
+    # If no return by now, nothing has changed.
+
+
+def quiz_cookie(func):
+    """
+    Runs quiz_cookie_manage on response object after request.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        if isinstance(response, unicode):
+            response = make_response(response)
+
+        quiz_cookie_manage(response)
+        return response
+    return wrapper
+
 @quiz.route("/")
+@quiz_cookie
 def choose():
     """
     Get user to choose which quiz.
@@ -39,6 +102,7 @@ def choose():
     )
 
 @quiz.route("/<quiz_module>")
+@quiz_cookie
 def attempt(quiz_module):
     """
     Attempt the quiz.
@@ -53,7 +117,7 @@ def attempt(quiz_module):
         abort(404): When the requested `quiz_module` does not exist.
     """
 
-    # Check the quiz exists.
+    # Check that the quiz exists.
     if quiz_module not in quizes.values():
         raise abort(404)
 
@@ -64,6 +128,7 @@ def attempt(quiz_module):
     )
 
 @quiz.route("/<quiz_module>/new")
+@quiz_cookie
 def new(quiz_module):
     """
     Create a new quiz instance.
@@ -87,5 +152,7 @@ def new(quiz_module):
     
     Quiz = load_quiz(quiz_module) 
     
-    return Quiz.create_new(shelve.get_shelve('c'))
-
+    g.quiz_id = Quiz.create_new(get_shelve())
+    
+    return make_response(g.quiz_id)
+    

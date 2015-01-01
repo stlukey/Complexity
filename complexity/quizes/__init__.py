@@ -14,7 +14,6 @@ from pkgutil import iter_modules
 from flask.ext.assets import Bundle
 
 SHELVE_INSTANCE_PREFIX = 'quiz-'
-COOKIE_INSTANCE_KEY = 'quiz'
 
 # Get the quizes package's path.
 quizes_path = os.path.dirname(__file__)
@@ -78,15 +77,6 @@ def load_quiz(quiz_module):
 
     return Quiz
 
-def delete_instance():
-    pass
-
-def add_instance(instance_id):
-    pass
-
-def get_instance():
-    pass
-
 class BaseQuiz(object):
     """
     Base Quiz object that all Quiz objects MUST inherit from.
@@ -121,7 +111,18 @@ class BaseQuiz(object):
         Returns:
             quiz (BaseQuiz): Quiz instance.
         """
-        return shelve[SHELVE_INSTANCE_PREFIX + id_]
+        return shelve[SHELVE_INSTANCE_PREFIX + str(id_)]
+
+    @classmethod
+    def remove_instance(cls, shelve, id_):
+        """
+        Remove instance from shelve file.
+
+        Args:
+            shelve (Shelve): The open shelve (file) from flask-shelve.
+            id_ (str): The Quiz instance's ID.
+        """
+        cls.get_instance(shelve, id_).remove(shelve)
 
     def id(self, shelve):
         """
@@ -154,7 +155,7 @@ class BaseQuiz(object):
 
     def save(self, shelve):
         """
-        Save instance.
+        Save instance to shelve file.
 
         Args:
             shelve (Shelve): The open shelve (file) from flask-shelve.
@@ -165,4 +166,14 @@ class BaseQuiz(object):
         id_ = self.id(shelve)
         shelve[SHELVE_INSTANCE_PREFIX + id_] = self
         return id_
+
+    def remove(self, shelve):
+        """
+        Remove instance from shelve file.
+
+        Args:
+            shelve (Shelve): The open shelve (file) from flask-shelve.
+        """
+        id_ = self.id(shelve)
+        del shelve[SHELVE_INSTANCE_PREFIX + id_]
         
