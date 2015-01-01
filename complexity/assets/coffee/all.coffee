@@ -5,8 +5,8 @@
     ~~~~~~~~~~~~~~~~~~~~~~
     Core coffee script.
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
+    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    License: New BSD, see LICENSE for more details.
 ###
 
 class Complexity
