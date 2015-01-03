@@ -12,7 +12,7 @@
 from functools import wraps
 
 from flask import (Blueprint, render_template, request, redirect,
-                   url_for, abort, g, make_response)
+                   url_for, abort, g, make_response, jsonify, Response)
 from flask.ext import shelve
 
 from cookies import Cookie
@@ -72,7 +72,7 @@ def quiz_cookie(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         response = func(*args, **kwargs)
-        if isinstance(response, unicode):
+        if not isinstance(response, Response):
             response = make_response(response)
 
         quiz_cookie_manage(response)
@@ -134,7 +134,7 @@ def attempt(quiz_module):
 
     return render_template("%s.html" % quiz_module, **template_vars)
 
-# NOTE: Endpoints accessed by client side scripts begin with a '_'
+# NOTE: Endpoints used by client side scripts begin with a '_'
 
 @quiz.route("/<quiz_module>/_new")
 @quiz_cookie
@@ -163,7 +163,7 @@ def _new(quiz_module):
     
     g.quiz_id = Quiz.create_new(get_shelve())
     
-    return make_response(g.quiz_id)
+    return jsonify(dict(ID=g.quiz_id))
 
 @quiz.route("/<quiz_module>/_next", methods=['GET', 'POST'])
 @quiz_cookie
@@ -174,5 +174,5 @@ def _next(quiz_module):
 
     quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
 
-    return quiz.next()
+    return jsonify(quiz.next())
 

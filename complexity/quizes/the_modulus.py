@@ -14,7 +14,7 @@ class Quiz(BaseQuiz):
     def next(self):
         """
         """
-        return unicode('')
+        return {}
 
     def get_question(self):
         pass

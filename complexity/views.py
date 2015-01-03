@@ -13,6 +13,9 @@
 from . import app
 from quiz import quiz
 
+from flask import render_template
+from utils import get_shelve
+
 @app.route("/")
 def index():
     """

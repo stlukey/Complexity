@@ -12,13 +12,11 @@
 
 import os
 
-from flask import Flask, render_template
+from flask import Flask
 from flask.ext import shelve
 from flask.ext.assets import Bundle, Environment
 
 from quizes import register_assets as register_quizes_assets
-
-from utils import get_shelve
 
 # NOTE: Idealy either a JSON file or a file containing a pickled
 #       Python dictionary would be used for storage as the storage
