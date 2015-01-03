@@ -5,7 +5,6 @@ Complexity is a learning tool for complex numbers.
 
 ## TODO ##
 
- * Create tests for the_modulus.
  * Create the_modulus server side.
     - Write MathExpr obj
     - Write MathExpr object operators for complex numbers
