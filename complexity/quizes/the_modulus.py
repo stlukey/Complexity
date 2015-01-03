@@ -11,5 +11,14 @@
 from . import BaseQuiz
 
 class Quiz(BaseQuiz):
-    pass
+    def next(self):
+        """
+        """
+        return unicode('')
+
+    def get_question(self):
+        pass
+
+    def post_answer(self):
+        pass
 

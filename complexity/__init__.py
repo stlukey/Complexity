@@ -18,7 +18,6 @@ from flask.ext.assets import Bundle, Environment
 
 from quizes import register_assets as register_quizes_assets
 
-from quiz import quiz
 from utils import get_shelve
 
 # NOTE: Idealy either a JSON file or a file containing a pickled
@@ -34,7 +33,6 @@ from utils import get_shelve
 #       with the Flask web framework and provides a locking
 #       mechanism over the pickled data file. Hence, this is why it
 #       is used for storage.
-
 
 ####### Configuration #######
 
@@ -90,19 +88,7 @@ register_quizes_assets(assets)
 
 #############################
 
-@app.route("/")
-def index():
-    """
-    The index page.
-    Just welcomes the user and asks them to start a quiz. 
-    """
-    return render_template('index.html')
+# Now every thing is set up load the views.
 
-# TODO: Remove for release.
-@app.route("/shelve")
-def show_shelve():
-    return str(dict(get_shelve()))
-
-# Register blueprints.
-app.register_blueprint(quiz, url_prefix="/quiz")
+import views
 

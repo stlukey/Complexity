@@ -17,7 +17,6 @@
 </head>
 <body>
 
-
     <!-- Navbar -->
     <nav class="navbar navbar-inverse navbar-static-top hidden" role="navigation">
         <div class="container">
@@ -59,6 +58,9 @@
     </div>
     
     {% block js %}
+        <script>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
         {% assets "js_all" %}
             <script src="{{ ASSET_URL }}"></script>
         {% endassets %}

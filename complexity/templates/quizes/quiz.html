@@ -27,6 +27,9 @@
 
 {% block js %}
     {{ super() }}
+    <script>
+        $SCRIPT_QUIZ_URLS = {{ SCRIPT_QUIZ_URLS | tojson |safe }};
+    </script>
     {% assets "quiz-" + quiz_module %}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}

@@ -13,7 +13,7 @@ class Quiz
         @getId()
 
     getId: ->
-        $.get '/quiz/the_modulus/new'
+        $.get '/quiz/the_modulus/_new'
             .success (data) ->
                 console.log "Quiz ID: #{data}"
 

@@ -16,9 +16,10 @@ from flask import (Blueprint, render_template, request, redirect,
 from flask.ext import shelve
 
 from cookies import Cookie
-
 from utils import get_shelve
 from quizes import quizes, quizes_rev, quizes_path, load_quiz, BaseQuiz
+
+from . import app
 
 COOKIE_QUIZ = 'quiz'
 
@@ -63,7 +64,6 @@ def quiz_cookie_manage(response):
         return response.set_cookie(COOKIE_QUIZ, Cookie(quiz_resp).value)
     
     # If no return by now, nothing has changed.
-
 
 def quiz_cookie(func):
     """
@@ -121,15 +121,24 @@ def attempt(quiz_module):
     if quiz_module not in quizes.values():
         raise abort(404)
 
-    return render_template(
-        "%s.html" % quiz_module,
-        quiz_name=quizes_rev[quiz_module],
-        quiz_module=quiz_module
-    )
+    template_vars = {}
+    
+    template_vars['quiz_name'] = quizes_rev[quiz_module]
+    template_vars['quiz_module'] = quiz_module
+    template_vars['SCRIPT_QUIZ_URLS'] = {
+        rule.endpoint[len('quiz._'):]:
+            url_for(rule.endpoint, quiz_module=quiz_module)
+                for rule in app.url_map.iter_rules()
+                    if rule.endpoint.startswith('quiz._')     
+    }
 
-@quiz.route("/<quiz_module>/new")
+    return render_template("%s.html" % quiz_module, **template_vars)
+
+# NOTE: Endpoints accessed by client side scripts begin with a '_'
+
+@quiz.route("/<quiz_module>/_new")
 @quiz_cookie
-def new(quiz_module):
+def _new(quiz_module):
     """
     Create a new quiz instance.
 
@@ -155,4 +164,15 @@ def new(quiz_module):
     g.quiz_id = Quiz.create_new(get_shelve())
     
     return make_response(g.quiz_id)
-    
+
+@quiz.route("/<quiz_module>/_next", methods=['GET', 'POST'])
+@quiz_cookie
+def _next(quiz_module):
+    quiz_id = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
+    if quiz_id == None:
+        abort(400)
+
+    quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
+
+    return quiz.next()
+

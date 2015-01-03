@@ -84,7 +84,6 @@ class ComplexityApp(Gtk.Application):
 
         # self.set_theme()
 
-
     def set_theme(self):
         css_provider = Gtk.CssProvider()
         css_provider.load_from_path("/usr/share/themes/Adwaita/gtk-3.0/gtk.css")
