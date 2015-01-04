@@ -170,12 +170,12 @@ class OPERATORS:
     @MathsOperator.new(BODMAS.division)
     def divide(*operands, **kwargs):
         if len(operands) == 2:
-            value = '\frac{{ {} }}{{ {} }}'.format(*[
+            value = '\\frac{{ {} }}{{ {} }}'.format(*[
                 str(operand.render(**kwargs))
                     for operand in operands
             ])
         else:
-            value = ' \ '.join([
+            value = ' \\ '.join([
                 operand.render_auto_brackets(order, **kwargs)
                     for operand in operands
             ])
@@ -183,6 +183,14 @@ class OPERATORS:
         return MathsOperand(
             value,
             BODMAS.division,
+            seed=kwargs.get('seed')
+        )
+
+    @MathsOperator.new(BODMAS.brackets)
+    def abs(operand, **kwargs):
+        return MathsOperand(
+            '\\left|{} \\right|'.format(operand.render(**kwargs)),
+            BODMAS.brackets,
             seed=kwargs.get('seed')
         )
 
