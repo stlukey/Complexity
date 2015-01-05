@@ -308,9 +308,9 @@ class MathsComplexNumber(MathsExpression):
         #   = ----------------------
         #         c*c + d*d
 
-        divider = c*c + d*d
+        divisor = c*c + d*d
         return MathsComplexNumber(
-                (a*c + b*d) / divider,
-                (c*b - a*d) / divider
+                (a*c + b*d) / divisor,
+                (c*b - a*d) / divisor
         )
 
