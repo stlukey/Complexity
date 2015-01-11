@@ -15,7 +15,7 @@ from flask import (Blueprint, render_template, request, redirect,
                    url_for, abort, g, make_response, jsonify, Response)
 from flask.ext import shelve
 
-from cookies import Cookie
+from cookie import Cookie
 from utils import get_shelve
 from quizes import quizes, quizes_rev, quizes_path, load_quiz, BaseQuiz
 

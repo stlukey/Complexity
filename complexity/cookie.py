@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 """
-    Complexity: cookies.py
-    ~~~~~~~~~~~~~~~~~~~~~~
+    Complexity: cookie.py
+    ~~~~~~~~~~~~~~~~~~~~~
     
     Cookie Tools.
 
