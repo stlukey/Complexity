@@ -10,7 +10,6 @@
 
 import os
 import uuid
-import dill
 from pkgutil import iter_modules
 from flask.ext.assets import Bundle
 
