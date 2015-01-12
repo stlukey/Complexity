@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 """
-    Complexity: quizes/__init__.py
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Complexity: quizzes/__init__.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
     License: New BSD, see LICENSE for more details.
@@ -10,17 +10,18 @@
 
 import os
 import uuid
+import dill
 from pkgutil import iter_modules
 from flask.ext.assets import Bundle
 
 SHELVE_INSTANCE_PREFIX = 'quiz-'
 
-# Get the quizes package's path.
-quizes_path = os.path.dirname(__file__)
+# Get the quizzes package's path.
+quizzes_path = os.path.dirname(__file__)
 
 # Find all quiz modules.
 quiz_modules = [
-    module for _, module, _ in iter_modules([quizes_path])
+    module for _, module, _ in iter_modules([quizzes_path])
 ]
 
 # Create name (replace '_' with spaces and make title case).
@@ -28,15 +29,15 @@ quiz_names = [
     module.replace('_', ' ').title() for module in quiz_modules
 ]
 
-# Generate dictionary of quizes and there names.
-quizes = {
+# Generate dictionary of quizzes and there names.
+quizzes = {
     name:module
         for name in quiz_names
             for module in quiz_modules
 }
 
 # For reverse lookup.
-quizes_rev = {v: k for k, v in quizes.items()}
+quizzes_rev = {v: k for k, v in quizzes.items()}
 
 def register_assets(assets):
     """
@@ -51,7 +52,7 @@ def register_assets(assets):
             'quiz-' + module,
             Bundle(
                 Bundle(
-                    'quizes/{}.coffee'.format(module),
+                    'quizzes/{}.coffee'.format(module),
                     filters=['coffeescript']
                 ),
                 output='quiz-{}.js'.format(module)
@@ -64,7 +65,7 @@ def load_quiz(quiz_module):
     
     Args:
         quiz_module (str): Name of module that contains `Quiz` class
-                           in the package `quizes`.
+                           in the package `quizzes`.
 
     Returns:
         Quiz (BaseQuiz): The `Quiz` class from `quiz_module`.

@@ -14,8 +14,7 @@
 # Elsewhere, the operators in `OPERATORS` should be used. 
 import operator as _operator
 
-# Same here too.
-from random import Random as _Random
+from random import Random
 
 import math
 
@@ -33,7 +32,7 @@ class BODMAS(object):
 make_brackets = lambda s: '({})'.format(s)
 
 class MathsOperand(object):
-    def __init__(self, value=None, order=None, seed=None):
+    def __init__(self, value=None, order=None, **kwargs):
         self._value = value
         self._order = order
 
@@ -68,24 +67,31 @@ class MathsConstant(MathsOperand):
             order=None,
         )
 
-class MathRandomConstant(MathsConstant):
+class MathsRandomConstant(MathsConstant):
     def __init__(self, start, end, step=1):
         self._start = start
         self._end = end
         self._step = step
+        self.reset()
 
         return super(MathsRandomConstant, self).__init__(
-            value=None,
-            order=None,
+            value=None
         )
 
-    def render(self, *args, **kwargs):
-        if random is None:
-            if seed is None:
-                raise ValueError
-            random = _Random(seed)
+    def reset(self):
+        self._render = None
 
-        return random.randrange(self._start, self._end, self._step)
+    def render(self, **kwargs):
+        if hasattr(self, '_render') and self._render is not None:
+            return self._render
+
+        random = kwargs.get('random')
+
+        if random is None:
+            random = Random()
+
+        self._render =  random.randrange(self._start, self._end, self._step)
+        return self._render
 
 class MathsVariable(MathsOperand):
     def __init__(self, value):
@@ -115,7 +121,7 @@ class MathsOperator(object):
                         for operand in operands
                 ]),
                 order,
-                seed=kwargs.get('seed')
+                **kwargs
             )
         return func
 
@@ -164,7 +170,7 @@ class OPERATORS:
         return MathsOperand(
             explicit + implicit,
             BODMAS.multiplication,
-            seed=kwargs.get('seed'),
+            **kwargs
         )
 
     @MathsOperator.new(BODMAS.division)
@@ -183,7 +189,7 @@ class OPERATORS:
         return MathsOperand(
             value,
             BODMAS.division,
-            seed=kwargs.get('seed')
+            **kwargs
         )
 
     @MathsOperator.new(BODMAS.brackets)
@@ -191,7 +197,15 @@ class OPERATORS:
         return MathsOperand(
             '\\left|{} \\right|'.format(operand.render(**kwargs)),
             BODMAS.brackets,
-            seed=kwargs.get('seed')
+            **kwargs
+        )
+
+    @MathsOperator.new(BODMAS.brackets)
+    def sqrt(operand, **kwargs):
+        return MathsOperand(
+            '\sqrt{{ {} }}'.format(operand.render(**kwargs)),
+            BODMAS.brackets,
+            **kwargs
         )
 
 class MathsExpression(MathsOperand):
@@ -199,6 +213,9 @@ class MathsExpression(MathsOperand):
     Represent maths expressions.
     """
     def __init__(self, operands, operator=OPERATORS.multiply, *args, **kwargs):
+        if isinstance(operands, MathsOperand):
+            operands = [operands]
+        
         if not isinstance(operands, list):
             if not isinstance(operands, collections.Iterable):
                 raise ValueError
@@ -207,8 +224,8 @@ class MathsExpression(MathsOperand):
         if not len(operands):
             raise ValueError
 
-        self._operands = operands
-        self._operator = operator
+        self.operands = operands
+        self.operator = operator
 
         return super(MathsExpression, self).__init__(
             order=operator.order,
@@ -216,15 +233,12 @@ class MathsExpression(MathsOperand):
         )
 
     def render(self, **kwargs):
-        if kwargs.get('render') == None:
-            kwargs['random'] = _Random(kwargs.get('seed'))
-        
-        if self._operator == OPERATORS.multiply:
-            if len(self._operands) == 1:
-                return self._operands[0].render(**kwargs)
+        if self.operator == OPERATORS.multiply:
+            if len(self.operands) == 1:
+                return self.operands[0].render(**kwargs)
 
-        return self._operator[DEFAULT_FORMAT](
-            *self._operands, **kwargs
+        return self.operator[DEFAULT_FORMAT](
+            *self.operands, **kwargs
         ).render(**kwargs)
 
 class MathsImaginaryNumber(MathsExpression):
@@ -248,31 +262,24 @@ class MathsComplexNumber(MathsExpression):
         )
         return
 
-    @classmethod
-    def compute_modulus(cls, z):
-        if not isinstance(z, cls):
-            raise NotImplemented
-
+    def compute_modulus(z):
         #  z  = a + bj
         a, b = z.im, z.re
 
         # |z| = sqrt(a*a + b*b)
-        return MathsConstant(math.sqrt(a*a + b*b))
+        return MathsExpression(
+            MathsConstant(a*a + b*b),
+            OPERATORS.sqrt,
+        )
 
-    @classmethod
-    def compute_product(cls, *operands, **kwargs):
-        if not kwargs.get('type_checked', False):
-            for operand in operands:
-                if not isinstance(operand, cls):
-                    raise NotImplemented
+    def compute_product(self, *others):
+        if len(others) == 0:
+            return self
 
-        if not len(operands):
-            raise TypeError
+        # Make others mutable 
+        others = list(others)
 
-        if len(operands) == 1:
-            return operands[9]
-
-        z, w = operands.pop(0), operands.pop(0)
+        z, w = self, others.pop(0)
 
         # z  = a + bj
         # w  = c + dj
@@ -281,20 +288,14 @@ class MathsComplexNumber(MathsExpression):
 
         # zw = (a + bj)(c + dj)
         #    = (ac - bd) + (ad + cb)j
-        zw = cls(
-                a*c - b*d,
-                a*d + c*b
+        zw = MathsComplexNumber(
+                MathsConstant(a*c - b*d),
+                MathsConstant(a*d + c*b)
         )
         
-        return zw if not len(operands) else complex_multiply(
-            zw, *operands, type_checked=True
-        )
+        return zw.compute_product(*others)
     
-    @classmethod
-    def compute_divide(cls, z, w):
-        if not isinstance(cls, z) or not isinstance(cls, w):
-            raise NotImplemented
-
+    def compute_divide(z, w):
         # z  = a + bj
         # w  = c + dj
         a, b = z.re, z.im
@@ -310,7 +311,7 @@ class MathsComplexNumber(MathsExpression):
 
         divisor = c*c + d*d
         return MathsComplexNumber(
-                (a*c + b*d) / divisor,
-                (c*b - a*d) / divisor
+                MathsConstant((a*c + b*d) / divisor),
+                MathsConstant((c*b - a*d) / divisor)
         )
 

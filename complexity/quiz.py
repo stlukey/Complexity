@@ -17,13 +17,13 @@ from flask.ext import shelve
 
 from cookie import Cookie
 from utils import get_shelve
-from quizes import quizes, quizes_rev, quizes_path, load_quiz, BaseQuiz
+from quizzes import quizzes, quizzes_rev, quizzes_path, load_quiz, BaseQuiz
 
 from . import app
 
 COOKIE_QUIZ = 'quiz'
 
-quiz = Blueprint('quiz', __name__, template_folder='templates/quizes')
+quiz = Blueprint('quiz', __name__, template_folder='templates/quizzes')
 
 def quiz_cookie_manage(response):
     """
@@ -91,7 +91,7 @@ def choose():
 
     # Ask user which quiz.
     if 'quiz' not in request.args:
-        return render_template('new.html', quizes=quizes)
+        return render_template('new.html', quizzes=quizzes)
 
     # Redirect quiz request to the correct page.
     return redirect(
@@ -110,7 +110,7 @@ def attempt(quiz_module):
     Returns the HTML page for the quiz.
 
     Args:
-        quiz_module (str): The name of the module in the `quizes`
+        quiz_module (str): The name of the module in the `quizzes`
                            package where the `Quiz` class exists.
 
     Raises:
@@ -118,12 +118,12 @@ def attempt(quiz_module):
     """
 
     # Check that the quiz exists.
-    if quiz_module not in quizes.values():
+    if quiz_module not in quizzes.values():
         raise abort(404)
 
     template_vars = {}
     
-    template_vars['quiz_name'] = quizes_rev[quiz_module]
+    template_vars['quiz_name'] = quizzes_rev[quiz_module]
     template_vars['quiz_module'] = quiz_module
     template_vars['SCRIPT_QUIZ_URLS'] = {
         rule.endpoint[len('quiz._'):]:
@@ -145,7 +145,7 @@ def _new(quiz_module):
     Used by client side code to get a quiz instance.
 
     Args:
-        quiz_module (str): The name of the module in the `quizes`
+        quiz_module (str): The name of the module in the `quizzes`
                            package where the `Quiz` class exists.
 
     Returns:
@@ -156,7 +156,7 @@ def _new(quiz_module):
     """
 
     # Check the quiz exists.
-    if quiz_module not in quizes.values():
+    if quiz_module not in quizzes.values():
         raise abort(404)
     
     Quiz = load_quiz(quiz_module) 
@@ -174,5 +174,8 @@ def _next(quiz_module):
 
     quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
 
-    return jsonify(quiz.next())
+    resp = jsonify(quiz.next())
+    quiz.save(get_shelve())
+
+    return resp
 

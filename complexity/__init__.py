@@ -16,7 +16,7 @@ from flask import Flask
 from flask.ext import shelve
 from flask.ext.assets import Bundle, Environment
 
-from quizes import register_assets as register_quizes_assets
+from quizzes import register_assets as register_quizzes_assets
 
 # NOTE: Idealy either a JSON file or a file containing a pickled
 #       Python dictionary would be used for storage as the storage
@@ -82,7 +82,7 @@ assets.register(
     )
 )
 
-register_quizes_assets(assets)
+register_quizzes_assets(assets)
 
 #############################
 
