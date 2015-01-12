@@ -13,7 +13,7 @@
 import os
 
 from flask import Flask
-from flask.ext import shelve
+import custom_shelve as shelve
 from flask.ext.assets import Bundle, Environment
 
 from quizzes import register_assets as register_quizzes_assets
@@ -36,6 +36,7 @@ from quizzes import register_assets as register_quizzes_assets
 
 # Data filename.
 SHELVE_FILENAME = 'complexity.bin'
+SHELVE_PROTOCOL = 1
 
 # Assets directory.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')

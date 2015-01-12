@@ -19,6 +19,7 @@ from complexity.quiz import COOKIE_QUIZ
 
 import json
 
+
 class ComplexityTestCase(unittest.TestCase):
     def setUp(self):
         app.config['SHELVE_FILENAME'] = 'test_' + app.config['SHELVE_FILENAME']
