@@ -69,9 +69,9 @@ class ComplexityTestCase(unittest.TestCase):
         resp = self.quiz_next(module)
         q = json.loads(resp.data)
         answers = [
-            (q['question'][0][1][q['question'][0][2]], 10),
-            (q['question'][1][1][q['question'][1][2]], 9),
-            (q['question'][2][1][q['question'][2][2]], 3)
+            (q['question'][0][2], 10),
+            (q['question'][1][2], 9),
+            (q['question'][2][2], 3)
         ]
         resp = self.quiz_next_post(module, dict(answers=answers))
         score = json.loads(resp.data)['score']
@@ -81,9 +81,9 @@ class ComplexityTestCase(unittest.TestCase):
         resp = self.quiz_next(module)
         q = json.loads(resp.data)
         answers = [
-            (q['question'][0][1][q['question'][0][2]], 5),
-            (q['question'][1][1][q['question'][1][2]], 3),
-            (q['question'][2][1][q['question'][2][2]], 1)
+            (q['question'][0][2], 5),
+            (q['question'][1][2], 3),
+            (q['question'][2][2], 1)
         ]
         resp = self.quiz_next_post(module, dict(answers=answers))
         score = json.loads(resp.data)['score']

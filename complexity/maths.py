@@ -23,6 +23,7 @@ import collections
 IMAGINARY_NOTATION = 'j'
 DEFAULT_FORMAT='LaTeX'
 
+
 class BODMAS(object):
     (
         brackets, order, division, multiplication,
@@ -30,6 +31,7 @@ class BODMAS(object):
     ) = range(6)
 
 make_brackets = lambda s: '({})'.format(s)
+
 
 class MathsOperand(object):
     def __init__(self, value=None, order=None, **kwargs):
@@ -62,7 +64,7 @@ class MathsOperand(object):
 
 class MathsConstant(MathsOperand):
     def __init__(self, value):
-        return super(MathsConstant, self).__init__(
+        super(MathsConstant, self).__init__(
             value,
             order=None,
         )
@@ -74,7 +76,7 @@ class MathsRandomConstant(MathsConstant):
         self._step = step
         self.reset()
 
-        return super(MathsRandomConstant, self).__init__(
+        super(MathsRandomConstant, self).__init__(
             value=None
         )
 
@@ -95,7 +97,7 @@ class MathsRandomConstant(MathsConstant):
 
 class MathsVariable(MathsOperand):
     def __init__(self, value):
-        return super(MathsVariable, self).__init__(
+        super(MathsVariable, self).__init__(
             value,
             order=BODMAS.brackets
         )
@@ -227,7 +229,7 @@ class MathsExpression(MathsOperand):
         self.operands = operands
         self.operator = operator
 
-        return super(MathsExpression, self).__init__(
+        super(MathsExpression, self).__init__(
             order=operator.order,
             *args, **kwargs
         )
@@ -243,7 +245,7 @@ class MathsExpression(MathsOperand):
 
 class MathsImaginaryNumber(MathsExpression):
     def __init__(self, im, *args, **kwargs):
-        return super(MathsImaginaryNumber, self).__init__([
+        super(MathsImaginaryNumber, self).__init__([
                 im,
                 MathsVariable(IMAGINARY_NOTATION)
             ],
@@ -254,13 +256,12 @@ class MathsComplexNumber(MathsExpression):
     def __init__(self, re, im, *args, **kwargs):
         self.re = re.render(**kwargs)
         self.im = im.render(**kwargs)
-        return super(MathsComplexNumber, self).__init__([
+        super(MathsComplexNumber, self).__init__([
                 re,
                 MathsImaginaryNumber(im)
             ],
             OPERATORS.add, *args, **kwargs
         )
-        return
 
     def compute_modulus(z):
         #  z  = a + bj
@@ -289,8 +290,8 @@ class MathsComplexNumber(MathsExpression):
         # zw = (a + bj)(c + dj)
         #    = (ac - bd) + (ad + cb)j
         zw = MathsComplexNumber(
-                MathsConstant(a*c - b*d),
-                MathsConstant(a*d + c*b)
+            MathsConstant(a*c - b*d),
+            MathsConstant(a*d + c*b)
         )
         
         return zw.compute_product(*others)
@@ -311,7 +312,7 @@ class MathsComplexNumber(MathsExpression):
 
         divisor = c*c + d*d
         return MathsComplexNumber(
-                MathsConstant((a*c + b*d) / divisor),
-                MathsConstant((c*b - a*d) / divisor)
+            MathsConstant((a*c + b*d) / divisor),
+            MathsConstant((c*b - a*d) / divisor)
         )
 

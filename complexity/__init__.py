@@ -18,21 +18,21 @@ from custom.assets import Bundle, Environment
 
 from quizzes import register_assets as register_quizzes_assets
 
-# NOTE: Idealy either a JSON file or a file containing a pickled
+# NOTE: Ideally either a JSON file or a file containing a pickled
 #       Python dictionary would be used for storage as the storage
 #       required is not significant enough for a database. However
 #       the problem is multiple users could access the file at
 #       the same time and some may need to write data at the same
 #       time too. Python has a built-in module called 'shelves'
-#       that builds ontop of the 'pickle' module allowing for a
+#       that builds on top of the 'pickle' module allowing for a
 #       layer of abstraction, eliminating the need to manually write
 #       the pickled data to the file. 'flask-shelves' is a
-#       reimplementaion of the built-in 'shelves' module for use
+#       reimplementation of the built-in 'shelves' module for use
 #       with the Flask web framework and provides a locking
 #       mechanism over the pickled data file. Hence, this is why it
 #       is used for storage.
 
-####### Configuration #######
+# ~~~~ Configuration ~~~~
 
 # Data filename.
 SHELVE_FILENAME = 'complexity.bin'
@@ -41,7 +41,7 @@ SHELVE_PROTOCOL = 1
 # Assets.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')
 
-########### Setup ###########
+# ~~~~~ Setup ~~~~~
 
 # Flask app instance.
 app = Flask(__name__)
@@ -54,7 +54,7 @@ shelve.init_app(app)
 # Flask Assets.
 assets = Environment(app)
 
-########## Assets ###########
+# ~~~~~ Assets ~~~~~
 
 assets.load_path = [
     os.path.join(ASSETS_PATH, path)
@@ -86,7 +86,7 @@ assets.register(
 
 register_quizzes_assets(assets)
 
-#############################
+# ~~~~~~~~~~~
 
 # Now every thing is set up load the views.
 

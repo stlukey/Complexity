@@ -18,9 +18,6 @@ from ..maths import *
 
 class MultipleChoiceQuestion(object):
     def __init__(self):
-        """
-        Define: self.parts & self.data
-        """
         self.answered = False
         self.score = 0
 
@@ -35,7 +32,7 @@ class MultipleChoiceQuestion(object):
         correct_answer_index = random.randrange(0, 3)
         answers.insert(correct_answer_index, correct_answer)
 
-        return (question, answers, correct_answer_index)
+        return question, answers, correct_answer_index
 
     @property
     def question(self):
@@ -45,30 +42,28 @@ class MultipleChoiceQuestion(object):
         return self._question
 
     def ask(self):
-        question = {}
-        question['data'] = self.data
-        question['question'] = self.question
-
-        return question
+        return dict(
+            data=self.data,
+            question=self.question
+        )
 
     def answer(self, req_data):
         if self.answered:
             raise ValueError
 
         answers = req_data['answers']
-        score = 0
 
         for i in xrange(len(self.parts)):
-            if answers[i][0] == self.parts[i][2]:
+            if answers[i][0] == self._question[i][2]:
                 self.score += 5
-      
-        
+
         self.answered = True
         return self.score
 
+
 class MultiplyQuestion(MultipleChoiceQuestion):
     def __init__(self, *args, **kwargs):
-        # Varibles used to represent questions.
+        # Variables used to represent questions.
         self.z_var = MathsVariable('z')
         self.w_var = MathsVariable('w')
         self.zw_var = MathsExpression([
@@ -78,7 +73,7 @@ class MultiplyQuestion(MultipleChoiceQuestion):
             OPERATORS.multiply
         )
 
-        # Per-Question random varible definitions.
+        # Per-Question random variable definitions.
         self.z = MathsComplexNumber(
             MathsRandomConstant(1, 11),
             MathsRandomConstant(1, 11)
@@ -91,14 +86,10 @@ class MultiplyQuestion(MultipleChoiceQuestion):
 
         self.data = dict(z=self.z.render(), w=self.w.render())
         self.parts = [self.part_one, self.part_two, self.part_three]
-        return super(MultiplyQuestion, self).__init__(*args, **kwargs)
+        super(MultiplyQuestion, self).__init__(*args, **kwargs)
 
     @property
     def part_one(self):
-        def answers():
-            pass
-
-
         if not hasattr(self, '_part_one'):
             question = self.zw_var
             answers = self.zw, MathsConstant(1), MathsConstant(2)
@@ -212,10 +203,15 @@ class MultiplyQuestion(MultipleChoiceQuestion):
         if user_answer is not None:
             return correct_answer == user_answer
 
-        answers = [correct_answer, incorrect_answer_one, incorrect_answer_two]
+        answers = [
+            correct_answer,
+            incorrect_answer_one,
+            incorrect_answer_two
+        ]
         random.shuffle(answers)
 
         return answers
+
 
 class Quiz(BaseQuiz):
     def __init__(self, *args, **kwargs):
@@ -242,7 +238,7 @@ class Quiz(BaseQuiz):
         self._question = self._Question()
         return self._question
 
-    def next(self):
+    def next(self, json=None):
         if self.ask_spotted in (1, 2):
             if self.ask_spotted == 2:
                 score =  5 + (self.repeat_limit - self.repeat_count) * len(self.question.parts) * 5
@@ -252,7 +248,7 @@ class Quiz(BaseQuiz):
                 self.repeat_count = self.repeat_limit
                 return dict(score=self.score)
 
-            if request.json.get('spotted', False):
+            if json.get('spotted', False):
                 self.ask_spotted = 2
                 return dict(patterns=self.question.pattern())
             
@@ -264,28 +260,27 @@ class Quiz(BaseQuiz):
         return {
             'GET': self.get_question,
             'POST': self.answer_question,
-        }[request.method]()
+        }[request.method](json)
 
 
-    def get_question(self):
+    def get_question(self, json=None):
         """Get current question."""
         return self.question.ask()
 
-    def answer_question(self):
+    def answer_question(self, json):
         """Answer current question."""
-        data = request.json
-        self.score += self.self.question.answer(data)
+
+        self.score += self.question.answer(json)
         
-        resp_time = data['answers'][-1][2]
+        resp_time = json['answers'][-1][1]
         if self.prev_resp_time is not None:
             self.ask_spotted = int(resp_time < self.prev_resp_time)
         self.prev_resp_time = resp_time
         
-        resp = {}
-        resp['score'] = self.score
-        resp['ask_spotted'] = self.ask_spotted
-        return resp
-
+        return dict(
+            score=self.score,
+            ask_spotted=self.ask_spotted
+        )
 
     def finish_quiz(self):
         """Finish quiz, save scores"""

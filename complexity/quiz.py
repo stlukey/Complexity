@@ -172,11 +172,11 @@ def _next(quiz_module):
     if quiz_id == None:
         abort(400)
 
+    json = request.get_json() if request.method == 'POST' else None
+
     quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
+    resp = jsonify(quiz.next(json))
 
-    resp = jsonify(quiz.next())
-    
     g.quiz_id = quiz.save(get_shelve())
-
     return resp
 
