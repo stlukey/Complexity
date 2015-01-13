@@ -6,8 +6,8 @@
     
     Vars for fabric.
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
-    License: New BSD, see LICENSE for more details.
+    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :license: New BSD, see LICENSE for more details.
 """
 
 REQS = 'requirements.txt'

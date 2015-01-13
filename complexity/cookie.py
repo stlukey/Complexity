@@ -24,7 +24,9 @@ except ImportError:
 class Cookie(object):
     """
     Cookie object to sign and check cookie values.
-    Usage:
+
+    Usage::
+
         >>> print Cookie("I'm some data") # Create a Cookie
         "I'm some data|real-signature"
 

@@ -4,8 +4,8 @@
     Complexity: quizzes/__init__.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
-    License: New BSD, see LICENSE for more details.
+    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :license: New BSD, see LICENSE for more details.
 """
 
 import os
@@ -43,8 +43,7 @@ def register_assets(assets):
     Create and register assets for every quiz.
     (cant relative import assets?)
 
-    Args:
-        assets (Environment): Flask-Assets Environment.
+    :param assets: Flask-Assets Environment.
     """
     for module in quiz_modules:
         assets.register(
@@ -62,13 +61,11 @@ def load_quiz(quiz_module):
     """
     Load Quiz class for given module.
     
-    Args:
-        quiz_module (str): Name of module that contains `Quiz` class
-                           in the package `quizzes`.
+    :param quiz_module: Name of module that contains `Quiz` class
+                        in the package `quizzes`.
+    :type quiz_module: str
 
-    Returns:
-        Quiz (BaseQuiz): The `Quiz` class from `quiz_module`.
-
+    :returns: The `Quiz` class from `quiz_module`.
     """
 
     # TODO: Load dynamicallly based on `quiz_modulus` once more than
@@ -80,9 +77,6 @@ def load_quiz(quiz_module):
 class BaseQuiz(object):
     """
     Base Quiz object that all Quiz objects MUST inherit from.
-
-    Attributes:
-       _id (str): Private, access via `self.id` method.
     """
 
     @classmethod
@@ -90,12 +84,9 @@ class BaseQuiz(object):
         """
         Create new instance of `cls` and save in shelve.
 
-        Args:
-            cls (BaseQuiz): The Quiz class.
-            shelve (Shelve): The open shelve (file) from flask-shelves. 
+        :param shelve: The open shelve (file) from flask-shelves.
 
-        Returns:
-            str: The Quiz instance's ID.
+        :returns: The Quiz instance's ID.
         """
         return cls().save(shelve)
 
@@ -104,12 +95,10 @@ class BaseQuiz(object):
         """
         Get instance from the shelve file.
 
-        Args:
-            shelve (Shelve): The open shelve (file) from flask-shelves.
-            id_ (str): The Quiz instance's ID.
+        :param shelve: The open shelve (file) from flask-shelves.
+        :param id_: The Quiz instance's ID.
 
-        Returns:
-            quiz (BaseQuiz): Quiz instance.
+        :returns: Quiz instance.
         """
         return shelve[SHELVE_INSTANCE_PREFIX + str(id_)]
 
@@ -118,9 +107,8 @@ class BaseQuiz(object):
         """
         Remove instance from shelve file.
 
-        Args:
-            shelve (Shelve): The open shelve (file) from flask-shelve.
-            id_ (str): The Quiz instance's ID.
+        :param shelve: The open shelve (file) from flask-shelve.
+        :param id_: The Quiz instance's ID.
         """
         cls.get_instance(shelve, id_).remove(shelve)
 
@@ -128,11 +116,9 @@ class BaseQuiz(object):
         """
         Find or create and claim ID for instance.
 
-        Args:
-            shelve (Shelve): The open shelve (file) from flask-shelve.
+        :param shelve: The open shelve (file) from flask-shelve.
 
-        Returns:
-            str: The Quiz instance's ID.
+        :returns: The Quiz instance's ID.
         """
 
         if hasattr(self, '_id'):
@@ -157,11 +143,9 @@ class BaseQuiz(object):
         """
         Save instance to shelve file.
 
-        Args:
-            shelve (Shelve): The open shelve (file) from flask-shelve.
+        :param shelve: The open shelve (file) from flask-shelve.
 
-        Returns:
-            str: The Quiz instance's ID.
+        :returns: The Quiz instance's ID.
         """
         id_ = self.id(shelve)
         shelve[SHELVE_INSTANCE_PREFIX + id_] = self
@@ -171,9 +155,8 @@ class BaseQuiz(object):
         """
         Remove instance from shelve file.
 
-        Args:
-            shelve (Shelve): The open shelve (file) from flask-shelve.
+        :param shelve: The open shelve (file) from flask-shelve.
         """
         id_ = self.id(shelve)
         del shelve[SHELVE_INSTANCE_PREFIX + id_]
-        
+

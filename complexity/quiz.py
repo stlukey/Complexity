@@ -6,8 +6,8 @@
     
     Contains the quiz blueprint.
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
-    License: New BSD, see LICENSE for more details.
+    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :license: New BSD, see LICENSE for more details.
 """
 from functools import wraps
 
@@ -85,8 +85,8 @@ def choose():
     """
     Get user to choose which quiz.
 
-    Returns a HTML page with a form, then redircts them to the
-    correct quiz's page once the form is submited.
+    :returns: An HTML page with a form, then redirects them to the
+              correct quiz's page once the form is submitted.
     """
 
     # Ask user which quiz.
@@ -107,14 +107,13 @@ def attempt(quiz_module):
     """
     Attempt the quiz.
 
-    Returns the HTML page for the quiz.
+    :param quiz_module: The name of the module in the `quizzes`
+                        package where the `Quiz` class exists.
 
-    Args:
-        quiz_module (str): The name of the module in the `quizzes`
-                           package where the `Quiz` class exists.
+    :returns the HTML page for the quiz.
 
-    Raises:
-        abort(404): When the requested `quiz_module` does not exist.
+    :raises abort(404): When the requested `quiz_module` does not
+                        exist.
     """
 
     # Check that the quiz exists.
@@ -144,15 +143,12 @@ def _new(quiz_module):
 
     Used by client side code to get a quiz instance.
 
-    Args:
-        quiz_module (str): The name of the module in the `quizzes`
-                           package where the `Quiz` class exists.
+    :param quiz_module: The name of the module in the `quizzes`
+                        package where the `Quiz` class exists.
 
-    Returns:
-        str: The Quiz instance's ID.
+    :returns: The Quiz instance's ID.
 
-    Raises:
-        abort(404): When the requested `quiz_module` does not exist.
+    :raises abort(404): When the requested `quiz_module` does not exist.
     """
 
     # Check the quiz exists.
