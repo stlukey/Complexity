@@ -10,11 +10,11 @@
     :license: New BSD, see LICENSE for more details.
 """
 
-from . import app
-from quiz import quiz_bp
+from .. import app
+from .quiz import quiz_bp
 
 from flask import render_template
-from utils import get_shelve
+from ..utils import get_shelve
 
 @app.route("/")
 def index():
