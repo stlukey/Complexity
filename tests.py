@@ -147,8 +147,8 @@ class ComplexityTestCase(unittest.TestCase):
         score = json.loads(resp.data)['score']
         assert score == 3 * 5
 
-        # User shows they've incorrectly spotted the pattern and scores
-        # marks for next 2 questions are lost.
+        # User shows they've incorrectly spotted the pattern and
+        # scores marks for next 2 questions are lost.
         resp = self.quiz_next(module)
         q = json.loads(resp.data)
         answers = [
@@ -159,8 +159,6 @@ class ComplexityTestCase(unittest.TestCase):
         assert score == 3 * 5
 
         self.quiz_choose()
-
-
 
 if __name__ == '__main__':
     unittest.main()

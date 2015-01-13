@@ -14,6 +14,7 @@ from flask import request
 
 from . import BaseQuiz
 from ..maths import *
+from ..maths.complex import compute_modulus, compute_product
 
 
 class MultipleChoiceQuestion(object):
@@ -70,7 +71,7 @@ class MultiplyQuestion(MultipleChoiceQuestion):
                 self.z_var,
                 self.w_var
             ],
-            OPERATORS.multiply
+            operators.multiply
         )
 
         # Per-Question random variable definitions.
@@ -82,7 +83,7 @@ class MultiplyQuestion(MultipleChoiceQuestion):
             MathsRandomConstant(1, 11),
             MathsRandomConstant(1, 11)
         )
-        self.zw = self.z.compute_product(self.w)
+        self.zw = compute_product(self.z, self.w)
 
         self.data = dict(z=self.z.render(), w=self.w.render())
         self.parts = [self.part_one, self.part_two, self.part_three]
@@ -90,18 +91,40 @@ class MultiplyQuestion(MultipleChoiceQuestion):
 
     @property
     def part_one(self):
+        def answers():
+            step_re = int(self.zw.re * 0.1)
+            if step_re < 1:
+                step_re = 1
+            start_re = int(self.zw.re - step_re*10)
+            end_re = int(self.zw.re + step_re*10)
+
+
+            step_im = int(self.zw.im * 0.1)
+            if step_im < 1:
+                step_im = 1
+            start_im = int(self.zw.im - step_im*10)
+            end_im = int(self.zw.im + step_im*10)
+
+            wrong_answers = [
+                MathsComplexNumber(
+                    MathsRandomConstant(start_re, end_re, step_re),
+                    MathsRandomConstant(start_im, end_im, step_im)
+                ) for _ in xrange(2)
+            ]
+
+            return [self.zw] + wrong_answers
+
         if not hasattr(self, '_part_one'):
             question = self.zw_var
-            answers = self.zw, MathsConstant(1), MathsConstant(2)
 
-            self._part_one = question, answers
+            self._part_one = question, answers()
         
         return self._part_one
 
     @property
     def part_two(self):
         def answers():
-            zw_mod = self.zw.compute_modulus()
+            zw_mod = compute_modulus(self.zw)
 
             zw_mod_squared = zw_mod.operands[0]
 
@@ -112,7 +135,7 @@ class MultiplyQuestion(MultipleChoiceQuestion):
             wrong_answers = [
                 MathsExpression(
                     MathsRandomConstant(start, end, step),
-                    OPERATORS.sqrt
+                    operators.sqrt
                 ) for _ in xrange(2)
             ]
 
@@ -122,7 +145,7 @@ class MultiplyQuestion(MultipleChoiceQuestion):
         if not hasattr(self, '_part_two'):
             question = MathsExpression(
                 self.zw_var,
-                OPERATORS.abs
+                operators.abs
             )
 
             self._part_two = question, answers()
@@ -135,23 +158,23 @@ class MultiplyQuestion(MultipleChoiceQuestion):
             # |z|
             z_mod_var = MathsExpression([
                     MathsVariable('z'),
-                ], OPERATORS.abs
+                ], operators.abs
             )
             # |w|
             w_mod_var = MathsExpression([
                     MathsVariable('w'),
-                ], OPERATORS.abs
+                ], operators.abs
             )
             # |z||w|
             return MathsExpression([
                     z_mod_var, w_mod_var
-                ], OPERATORS.multiply
+                ], operators.multiply
             )
 
         def answers():
             # |a + bj| = sqrt(a*a + b*b)
-            z_mod = self.z.compute_modulus()
-            w_mod = self.w.compute_modulus()
+            z_mod = compute_modulus(self.z)
+            w_mod = compute_modulus(self.w)
             # |a + bj|^2 = a*a + b*b.
             z_mod_squared = z_mod.operands[0]
             w_mod_squared = w_mod.operands[0]
@@ -162,17 +185,19 @@ class MultiplyQuestion(MultipleChoiceQuestion):
             # |a + bj||c + dj| = sqrt[ (a*a + b*b) (c*c + d*d) ]
             z_mod_w_mod = MathsExpression(
                 z_mod_squared_w_mod_squared,
-                OPERATORS.sqrt
+                operators.sqrt
             )
 
             step = int(z_mod_squared_w_mod_squared.render() * 0.1)
+            if step < 1:
+                step = 1
             start = int(z_mod_squared_w_mod_squared.render() - step*10)
             end = int(z_mod_squared_w_mod_squared.render() + step*10)
 
             wrong_answers = [
                 MathsExpression(
                     MathsRandomConstant(start, end, step),
-                    OPERATORS.sqrt
+                    operators.sqrt
                 ) for _ in xrange(2)
             ]
 
@@ -187,14 +212,14 @@ class MultiplyQuestion(MultipleChoiceQuestion):
         equal = lambda exp1, exp2: '{} = {}'.format(exp1.render(),
                                                     exp2.render())
 
-        z_mod_var = MathsExpression(self.z_var, OPERATORS.abs)
-        w_mod_var = MathsExpression(self.w_var, OPERATORS.abs)
+        z_mod_var = MathsExpression(self.z_var, operators.abs)
+        w_mod_var = MathsExpression(self.w_var, operators.abs)
         z_mod_w_mod_var = MathsExpression([
             z_mod_var,
             w_mod_var
         ])
 
-        zw_mod_var = MathsExpression(self.zw_var, OPERATORS.abs)
+        zw_mod_var = MathsExpression(self.zw_var, operators.abs)
 
         correct_answer = equal(zw_mod_var, z_mod_w_mod_var)
         incorrect_answer_one = equal(z_mod_var, w_mod_var)
