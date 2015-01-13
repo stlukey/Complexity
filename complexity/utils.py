@@ -13,6 +13,7 @@
 from flask import g
 from custom import shelve
 
+
 def get_shelve(flag="c"):
     """
     Gets shelves and caches them per request.

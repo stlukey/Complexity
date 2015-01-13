@@ -10,18 +10,12 @@
     :license: New BSD, see LICENSE for more details.
 """
 
-# Prefixed with underscore as it should only be used internally.
-# Elsewhere, the operators in `OPERATORS` should be used. 
-import operator as _operator
-
 from random import Random
-
-import math
 
 import collections
 
 IMAGINARY_NOTATION = 'j'
-DEFAULT_FORMAT='LaTeX'
+DEFAULT_FORMAT = 'LaTeX'
 
 
 class BODMAS(object):
@@ -42,7 +36,7 @@ class MathsOperand(object):
     def enclosed(self):
         return self._order == BODMAS.brackets
 
-    def requies_brackets(self, order, explicit=True):
+    def requires_brackets(self, order, explicit=True):
         if self.enclosed:
             return False 
 
@@ -54,13 +48,14 @@ class MathsOperand(object):
     def render(self, **kwargs):
         return self._value
 
-    def render_auto_brackets(self, order, *args, **kwargs):
-        rendered = self.render(*args, **kwargs)
+    def render_auto_brackets(self, order, **kwargs):
+        rendered = self.render(**kwargs)
 
-        if self.requies_brackets(order):
+        if self.requires_brackets(order):
             rendered = make_brackets(rendered)
 
         return str(rendered)
+
 
 class MathsConstant(MathsOperand):
     def __init__(self, value):
@@ -69,12 +64,13 @@ class MathsConstant(MathsOperand):
             order=None,
         )
 
+
 class MathsRandomConstant(MathsConstant):
     def __init__(self, start, end, step=1):
         self._start = start
         self._end = end
         self._step = step
-        self.reset()
+        self._render = None
 
         super(MathsRandomConstant, self).__init__(
             value=None
@@ -92,8 +88,11 @@ class MathsRandomConstant(MathsConstant):
         if random is None:
             random = Random()
 
-        self._render =  random.randrange(self._start, self._end, self._step)
+        self._render = random.randrange(
+            self._start, self._end, self._step
+        )
         return self._render
+
 
 class MathsVariable(MathsOperand):
     def __init__(self, value):
@@ -101,6 +100,7 @@ class MathsVariable(MathsOperand):
             value,
             order=BODMAS.brackets
         )
+
 
 class MathsOperator(object):
     """
@@ -110,7 +110,7 @@ class MathsOperator(object):
     @classmethod
     def new(cls, order):
         def dec(func):
-            return cls(order, **{DEFAULT_FORMAT:func})
+            return cls(order, **{DEFAULT_FORMAT: func})
         return dec
    
     @classmethod
@@ -120,7 +120,7 @@ class MathsOperator(object):
             return MathsOperand(
                 delimiter.join([
                     operand.render_auto_brackets(order, **kwargs)
-                        for operand in operands
+                    for operand in operands
                 ]),
                 order,
                 **kwargs
@@ -134,7 +134,7 @@ class MathsOperator(object):
     def __call__(self, *operands, **kwargs):
         format_ = kwargs.get('format_', DEFAULT_FORMAT)
 
-        return self.__getatt__(format_)(*operands)
+        return self.__getitem__(format_)(*operands)
 
     def __getitem__(self, format_):
         return self._formats[format_]
@@ -142,7 +142,8 @@ class MathsOperator(object):
     def __eq__(self, other): 
         return self.__dict__ == other.__dict__
 
-class OPERATORS:
+
+class OPERATORS(object):
     """
     A collection of static MathsOperator instances.
     """
@@ -155,11 +156,19 @@ class OPERATORS:
         explicit = []
         implicit = []
         for operand in operands:
-            if operand.requies_brackets(BODMAS.multiplication, False):
-                if not operand.requies_brackets(BODMAS.multiplication):
-                    explicit.append(str(operand.render(**kwargs)))
+            if operand.requires_brackets(
+                BODMAS.multiplication, False
+            ):
+                if not operand.requires_brackets(
+                    BODMAS.multiplication
+                ):
+                    explicit.append(
+                        str(operand.render(**kwargs))
+                    )
                 else:
-                    implicit.append(make_brackets(operand.render(**kwargs)))
+                    implicit.append(
+                        make_brackets(operand.render(**kwargs))
+                    )
             else:
                 implicit.append(str(operand.render(**kwargs)))
 
@@ -167,7 +176,7 @@ class OPERATORS:
         implicit = ''.join(implicit)
 
         if len(implicit) and len(explicit):
-            explcit = make_brackets(explicit)
+            explicit = make_brackets(explicit)
 
         return MathsOperand(
             explicit + implicit,
@@ -180,12 +189,14 @@ class OPERATORS:
         if len(operands) == 2:
             value = '\\frac{{ {} }}{{ {} }}'.format(*[
                 str(operand.render(**kwargs))
-                    for operand in operands
+                for operand in operands
             ])
         else:
             value = ' \\ '.join([
-                operand.render_auto_brackets(order, **kwargs)
-                    for operand in operands
+                operand.render_auto_brackets(
+                    BODMAS.division, **kwargs
+                )
+                for operand in operands
             ])
 
         return MathsOperand(
@@ -243,6 +254,7 @@ class MathsExpression(MathsOperand):
             *self.operands, **kwargs
         ).render(**kwargs)
 
+
 class MathsImaginaryNumber(MathsExpression):
     def __init__(self, im, *args, **kwargs):
         super(MathsImaginaryNumber, self).__init__([
@@ -251,6 +263,7 @@ class MathsImaginaryNumber(MathsExpression):
             ],
             *args, **kwargs
         )
+
 
 class MathsComplexNumber(MathsExpression):
     def __init__(self, re, im, *args, **kwargs):

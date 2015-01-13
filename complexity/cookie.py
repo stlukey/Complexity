@@ -21,6 +21,7 @@ except ImportError:
     import sys
     sys.exit(1)
 
+
 class Cookie(object):
     """
     Cookie object to sign and check cookie values.
@@ -78,4 +79,5 @@ class Cookie(object):
             raise NotImplemented
 
         return self.value != other.value or self.hash != other.hash
+
 

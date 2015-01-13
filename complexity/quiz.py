@@ -12,18 +12,22 @@
 from functools import wraps
 
 from flask import (Blueprint, render_template, request, redirect,
-                   url_for, abort, g, make_response, jsonify, Response)
-from . import shelve
+                   url_for, abort, g, make_response, jsonify,
+                   Response)
 
 from cookie import Cookie
 from utils import get_shelve
-from quizzes import quizzes, quizzes_rev, quizzes_path, load_quiz, BaseQuiz
+from quizzes import quizzes, quizzes_rev, load_quiz, BaseQuiz
 
 from . import app
 
 COOKIE_QUIZ = 'quiz'
 
-quiz = Blueprint('quiz', __name__, template_folder='templates/quizzes')
+quiz_bp = Blueprint(
+    'quiz', __name__,
+    template_folder='templates/quizzes'
+)
+
 
 def quiz_cookie_manage(response):
     """
@@ -61,9 +65,12 @@ def quiz_cookie_manage(response):
                 pass
 
         # A new instance has been created.
-        return response.set_cookie(COOKIE_QUIZ, Cookie(quiz_resp).value)
+        return response.set_cookie(
+            COOKIE_QUIZ, Cookie(quiz_resp).value
+        )
     
     # If no return by now, nothing has changed.
+
 
 def quiz_cookie(func):
     """
@@ -79,7 +86,8 @@ def quiz_cookie(func):
         return response
     return wrapper
 
-@quiz.route("/")
+
+@quiz_bp.route("/")
 @quiz_cookie
 def choose():
     """
@@ -101,7 +109,8 @@ def choose():
         )
     )
 
-@quiz.route("/<quiz_module>")
+
+@quiz_bp.route("/<quiz_module>")
 @quiz_cookie
 def attempt(quiz_module):
     """
@@ -127,15 +136,16 @@ def attempt(quiz_module):
     template_vars['SCRIPT_QUIZ_URLS'] = {
         rule.endpoint[len('quiz._'):]:
             url_for(rule.endpoint, quiz_module=quiz_module)
-                for rule in app.url_map.iter_rules()
-                    if rule.endpoint.startswith('quiz._')     
+            for rule in app.url_map.iter_rules()
+            if rule.endpoint.startswith('quiz._')
     }
 
     return render_template("%s.html" % quiz_module, **template_vars)
 
 # NOTE: Endpoints used by client side scripts begin with a '_'
 
-@quiz.route("/<quiz_module>/_new")
+
+@quiz_bp.route("/<quiz_module>/_new")
 @quiz_cookie
 def _new(quiz_module):
     """
@@ -148,7 +158,7 @@ def _new(quiz_module):
 
     :returns: The Quiz instance's ID.
 
-    :raises abort(404): When the requested `quiz_module` does not exist.
+    :raises abort(404): The requested `quiz_module` does not exist.
     """
 
     # Check the quiz exists.
@@ -161,11 +171,12 @@ def _new(quiz_module):
     
     return jsonify(dict(ID=g.quiz_id))
 
-@quiz.route("/<quiz_module>/_next", methods=['GET', 'POST'])
+
+@quiz_bp.route("/<quiz_module>/_next", methods=['GET', 'POST'])
 @quiz_cookie
 def _next(quiz_module):
     quiz_id = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
-    if quiz_id == None:
+    if quiz_id is None:
         abort(400)
 
     json = request.get_json() if request.method == 'POST' else None
@@ -175,4 +186,3 @@ def _next(quiz_module):
 
     g.quiz_id = quiz.save(get_shelve())
     return resp
-

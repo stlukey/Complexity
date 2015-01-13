@@ -30,13 +30,14 @@ quiz_names = [
 
 # Generate dictionary of quizzes and there names.
 quizzes = {
-    name:module
-        for name in quiz_names
-            for module in quiz_modules
+    name: module
+    for name in quiz_names
+    for module in quiz_modules
 }
 
 # For reverse lookup.
 quizzes_rev = {v: k for k, v in quizzes.items()}
+
 
 def register_assets(assets):
     """
@@ -57,6 +58,7 @@ def register_assets(assets):
             )
         )
 
+
 def load_quiz(quiz_module):
     """
     Load Quiz class for given module.
@@ -68,11 +70,11 @@ def load_quiz(quiz_module):
     :returns: The `Quiz` class from `quiz_module`.
     """
 
-    # TODO: Load dynamicallly based on `quiz_modulus` once more than
-    #       one quiz exists.
+    # TODO: Load dynamically based on `quiz_modulus`.
     from the_modulus import Quiz
 
     return Quiz
+
 
 class BaseQuiz(object):
     """

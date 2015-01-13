@@ -19,6 +19,5 @@
 #       This is done for security reasons to leave cryptographic
 #       secrets out of the source code repository.
 
-
-COOKIE_SECRET = '' # base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
-
+# base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+COOKIE_SECRET = ''

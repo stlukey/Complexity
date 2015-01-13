@@ -13,8 +13,8 @@
 import os
 
 from flask import Flask
-from custom import shelve 
-from custom.assets import Bundle, Environment
+from .custom import shelve
+from .custom.assets import Bundle, Environment
 
 from quizzes import register_assets as register_quizzes_assets
 
@@ -58,7 +58,7 @@ assets = Environment(app)
 
 assets.load_path = [
     os.path.join(ASSETS_PATH, path)
-        for path in ['less', 'coffee', 'bower_components']
+    for path in ['less', 'coffee', 'bower_components']
 ]
 
 assets.register(
@@ -89,6 +89,4 @@ register_quizzes_assets(assets)
 # ~~~~~~~~~~~
 
 # Now every thing is set up load the views.
-
 import views
-

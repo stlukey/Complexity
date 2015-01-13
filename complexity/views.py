@@ -11,7 +11,7 @@
 """
 
 from . import app
-from quiz import quiz
+from quiz import quiz_bp
 
 from flask import render_template
 from utils import get_shelve
@@ -24,11 +24,12 @@ def index():
     """
     return render_template('index.html')
 
+
 # TODO: Remove for release.
 @app.route("/shelve")
 def show_shelve():
     return str(dict(get_shelve()))
 
-# Register blueprints.
-app.register_blueprint(quiz, url_prefix="/quiz")
 
+# Register blueprints.
+app.register_blueprint(quiz_bp, url_prefix="/quiz")
