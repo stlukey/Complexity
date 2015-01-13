@@ -11,7 +11,7 @@
 import os
 import uuid
 from pkgutil import iter_modules
-from flask.ext.assets import Bundle
+from .. import Bundle
 
 SHELVE_INSTANCE_PREFIX = 'quiz-'
 

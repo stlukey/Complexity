@@ -13,7 +13,7 @@ from functools import wraps
 
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, abort, g, make_response, jsonify, Response)
-import custom_shelve as shelve
+from . import shelve
 
 from cookie import Cookie
 from utils import get_shelve
@@ -175,7 +175,8 @@ def _next(quiz_module):
     quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
 
     resp = jsonify(quiz.next())
-    quiz.save(get_shelve())
+    
+    g.quiz_id = quiz.save(get_shelve())
 
     return resp
 

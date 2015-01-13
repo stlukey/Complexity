@@ -11,7 +11,7 @@
 """
 
 from flask import g
-import custom_shelve as shelve
+from custom import shelve
 
 def get_shelve(flag="c"):
     """

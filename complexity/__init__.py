@@ -13,8 +13,8 @@
 import os
 
 from flask import Flask
-import custom_shelve as shelve
-from flask.ext.assets import Bundle, Environment
+from custom import shelve 
+from custom.assets import Bundle, Environment
 
 from quizzes import register_assets as register_quizzes_assets
 
@@ -38,7 +38,7 @@ from quizzes import register_assets as register_quizzes_assets
 SHELVE_FILENAME = 'complexity.bin'
 SHELVE_PROTOCOL = 1
 
-# Assets directory.
+# Assets.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')
 
 ########### Setup ###########
@@ -49,6 +49,7 @@ app.config.from_object(__name__)
 
 # The shelve.
 shelve.init_app(app)
+
 
 # Flask Assets.
 assets = Environment(app)
@@ -67,7 +68,7 @@ assets.register(
         'bootstrap/dist/js/bootstrap.min.js',
         Bundle(
             'all.coffee',
-            filters=['coffeescript']
+            filters=['coffeescript'],
         ),
         output='all.js'
     )
