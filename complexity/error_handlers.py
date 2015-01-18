@@ -13,10 +13,10 @@
 from flask import jsonify, request, make_response
 
 from . import app
-from errors import BadRequestError
+from errors import BaseError
 
 
-@app.errorhandler(BaseException)
+@app.errorhandler(BaseError)
 def handle_base_error(error):
     """
     Renders response content for when a custom exception is made.

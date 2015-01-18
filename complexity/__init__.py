@@ -68,10 +68,6 @@ assets.register(
         'bootstrap-without-jquery/bootstrap3/bootstrap-without-jquery.js',
         'zepto/zepto.js',
         'katex/build/katex.js',
-        Bundle(
-            'complexity.coffee',
-            filters=['coffeescript'],
-        ),
         output='all.js'
     )
 )
