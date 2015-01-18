@@ -6,7 +6,7 @@
     
     Contains the quiz blueprint.
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
 from functools import wraps
@@ -15,11 +15,11 @@ from flask import (Blueprint, render_template, request, redirect,
                    url_for, abort, g, make_response, jsonify,
                    Response)
 
+from .. import app
 from ..cookie import Cookie
 from ..utils import get_shelve
 from ..quizzes import quizzes, quizzes_rev, load_quiz, BaseQuiz
-
-from .. import app
+from ..errors import BadRequestError
 
 COOKIE_QUIZ = 'quiz'
 
@@ -79,6 +79,8 @@ def quiz_cookie(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         response = func(*args, **kwargs)
+
+        # Ensure the response is a response object.
         if not isinstance(response, Response):
             response = make_response(response)
 
@@ -96,7 +98,6 @@ def choose():
     :returns: An HTML page with a form, then redirects them to the
               correct quiz's page once the form is submitted.
     """
-
     # Ask user which quiz.
     if 'quiz' not in request.args:
         return render_template('new.html', quizzes=quizzes)
@@ -129,11 +130,12 @@ def attempt(quiz_module):
     if quiz_module not in quizzes.values():
         raise abort(404)
 
+    # Build template vars.
     template_vars = {}
-    
     template_vars['quiz_name'] = quizzes_rev[quiz_module]
     template_vars['quiz_module'] = quiz_module
     template_vars['SCRIPT_QUIZ_URLS'] = {
+        # Create dictionary of endpoints for client side scripts.
         rule.endpoint[len('quiz._'):]:
             url_for(rule.endpoint, quiz_module=quiz_module)
             for rule in app.url_map.iter_rules()
@@ -175,14 +177,63 @@ def _new(quiz_module):
 @quiz_bp.route("/<quiz_module>/_next", methods=['GET', 'POST'])
 @quiz_cookie
 def _next(quiz_module):
+    """
+    Answer/Ask next question.
+
+    :param quiz_module: The name of the module in the `quizzes`
+                        package where the `Quiz` class exists.
+
+    :returns: The quiz's response.
+
+    :raises BadRequestError:
+    :raises abort(404): The requested `quiz_module` does not exist.
+    """
+    # Check the quiz exists.
+    if quiz_module not in quizzes.values():
+        raise abort(404)
+
     quiz_id = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
     if quiz_id is None:
-        abort(400)
+        raise BadRequestError("No Quiz ID!")
 
-    json = request.get_json() if request.method == 'POST' else None
+    json = None
+    if request.method == 'POST':
+        json = request.get_json()
+
+        if not isinstance(json, dict):
+            raise BadRequestError("Expected json object.")
 
     quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
     resp = jsonify(quiz.next(json))
 
     g.quiz_id = quiz.save(get_shelve())
     return resp
+
+@quiz_bp.route("/<quiz_module>/finish", methods=['POST'])
+@quiz_cookie
+def _finish(quiz_module):
+    """
+    Finish quiz.
+    """
+    # Check the quiz exists.
+    if quiz_module not in quizzes.values():
+        raise abort(404)
+
+    quiz_id = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
+    if quiz_id is None:
+        raise BadRequestError("No Quiz ID!")
+
+    quiz = load_quiz(quiz_module).get_instance(get_shelve(), quiz_id)
+    if not quiz.ended:
+        raise BadRequestError("Quiz not ended!")
+
+    name = request.form.get('name', None)
+    shelve = get_shelve()
+
+    if name is not None:
+        quiz.finish(name, shelve)
+    quiz.remove(shelve)
+
+    return redirect(url_for('index'))
+
+

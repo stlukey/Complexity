@@ -3,32 +3,29 @@
 """
     Complexity: tests
     ~~~~~~~~~~~~~~~~~
-    
+ m+
     Test suite for complexity.
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    Copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     License: New BSD, see LICENSE for more details.
 """
 import os
 import unittest
-import tempfile
 
 from complexity import app
 from complexity.quizzes import quiz_modules
-from complexity.quiz import COOKIE_QUIZ
 
 import json
 
 
 class ComplexityTestCase(unittest.TestCase):
     def setUp(self):
-        app.config['SHELVE_FILENAME'] = 'test_' + app.config['SHELVE_FILENAME']
+        app.config['SHELVE_FILENAME'] = 'test.bin'
         app.config['TESTING'] = True
         self.test_client = app.test_client()
 
     def tearDown(self):
-        # os.unlink(app.config['SHELVE_FILENAME'])
-        pass
+        os.unlink(app.config['SHELVE_FILENAME'])
 
     def quiz_new(self, quiz_module):
         return self.test_client.get('/quiz/{}/_new'.format(quiz_module))
@@ -48,115 +45,99 @@ class ComplexityTestCase(unittest.TestCase):
     def test_quiz_cookies(self):
         resp = self.quiz_next(quiz_modules[0])
         self.assertNotEqual(resp.status, '200 OK')
-        
+
         self.quiz_new(quiz_modules[0])
-        
+
         resp = self.quiz_next(quiz_modules[0])
         self.assertEqual(resp.status, '200 OK')
 
-        self.quiz_choose()
+        self.test_client.cookie_jar = None
+
 
         resp = self.quiz_next(quiz_modules[0])
-        self.assertNotEqual(resp.status, '200 OK')
+        self.assertEqual(resp.status, '400 BAD REQUEST')
 
+    def the_modulus_two_correct(self, module="the_modulus"):
+        # Answer first question perfectly.
+        resp = self.quiz_next(module)
+        q = json.loads(resp.data)
+        question = q['question']
+        answer = [
+            (question[0][2], 10),
+            (question[1][2], 9),
+            (question[2][2], 3)
+        ]
+        resp = self.quiz_next_post(module, dict(answer=answer))
+        score = json.loads(resp.data)['score']
+        self.assertEqual(score, 3 * 5)
+
+        # Answer second question perfectly, but faster.
+        resp = self.quiz_next(module)
+        q = json.loads(resp.data)
+        question = q['question']
+        answer = [
+            (question[0][2], 5),
+            (question[1][2], 3),
+            (question[2][2], 1)
+        ]
+        resp = self.quiz_next_post(module, dict(answer=answer)).data
+        resp = json.loads(resp)
+        self.assertEqual(resp['score'], 3 * 5 * 2)
+
+        return resp
 
     def test_the_modulus_all_correct(self):
         module = 'the_modulus'
 
         self.quiz_new(module)
         
-        # Answer first question perfectly.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        answers = [
-            (q['question'][0][2], 10),
-            (q['question'][1][2], 9),
-            (q['question'][2][2], 3)
-        ]
-        resp = self.quiz_next_post(module, dict(answers=answers))
-        score = json.loads(resp.data)['score']
-        assert score == 3 * 5
-
-        # Answer second question perfectly, but faster.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        answers = [
-            (q['question'][0][2], 5),
-            (q['question'][1][2], 3),
-            (q['question'][2][2], 1)
-        ]
-        resp = self.quiz_next_post(module, dict(answers=answers))
-        score = json.loads(resp.data)['score']
-        assert score == 3 * 5 * 2
+        resp = self.the_modulus_two_correct(module)
 
         # Server detect pattern may have been spotted and user says
         # they've spotted it.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        assert q['ask_spotted']
-        # Resend `q` again to mimic spotted request.
-        patterns = self.quiz_next_post(module, dict(spotted=True))
+        self.assert_(resp['spotted'])
+        patterns = json.loads(
+            self.quiz_next_post(module, dict(spotted=True)).data
+        )['patterns']
 
+
+        CORRECT_PATTERN = r'\left|zw \right| = \left|z \right|\left|w \right|'
+
+        self.assertIn(CORRECT_PATTERN, patterns)
 
         # User shows they've correctly spotted the pattern and scores
         # marks for next question.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        resp = self.quiz_next_post(module, dict(pattern=r'\left|zw \right| = \left|z \right|\left|w \right|'))
+        resp = self.quiz_next_post(module, dict(answer=CORRECT_PATTERN))
         score = json.loads(resp.data)['score']
-        assert score == 3 * 5 * 5 + 5
+        self.assertEquals(score, 5*3*5 + 5)
 
         self.quiz_choose()
 
-    def test_the_modulus_incorrect_pattern_spotted(self):
+    def test_the_modulus_all_correct_not_spotted(self):
         module = 'the_modulus'
 
         self.quiz_new(module)
-        
-        # Answer first question perfectly.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        answers = [
-            (q['question'][0][1][q['question'][0][2]], 10),
-            (q['question'][1][1][q['question'][1][2]], 9),
-            (q['question'][2][1][q['question'][2][2]], 3)
-        ]
-        resp = self.quiz_next_post(module, answers)
-        score = json.loads(resp.data)['score']
-        assert score == 3 * 5
 
-        # Answer second question perfectly, but faster.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        answers = [
-            (q['question'][0][1][q['question'][0][2]], 5),
-            (q['question'][1][1][q['question'][1][2]], 3),
-            (q['question'][2][1][q['question'][2][2]], 1)
-        ]
-        resp = self.quiz_next_post(module, answers)
-        score = json.loads(resp.data)['score']
-        assert score == 3 * 5 * 2
+        resp = self.the_modulus_two_correct(module)
 
         # Server detect pattern may have been spotted and user says
         # they've spotted it.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        assert q['ask_spotted']
-        # Resend `q` again to mimic spotted request.
-        resp = self.quiz_next_post(module, q)
-        score = json.loads(resp.data)['score']
-        assert score == 3 * 5
+        self.assert_(resp['spotted'])
+        patterns = json.loads(
+            self.quiz_next_post(module, dict(spotted=True)).data
+        )['patterns']
 
-        # User shows they've incorrectly spotted the pattern and
-        # scores marks for next 2 questions are lost.
-        resp = self.quiz_next(module)
-        q = json.loads(resp.data)
-        answers = [
-            (q['question'][0][1][q['question'][0][2]-1], 10),
-        ]
-        resp = self.quiz_next_post(module, answers)
+
+        CORRECT_PATTERN = r'\left|zw \right| = \left|z \right|\left|w \right|'
+
+        self.assertIn(CORRECT_PATTERN, patterns)
+
+        # User shows they've correctly spotted the pattern and scores
+        # marks for next question.
+        del patterns[patterns.index(CORRECT_PATTERN)]
+        resp = self.quiz_next_post(module, dict(answer=patterns.pop()))
         score = json.loads(resp.data)['score']
-        assert score == 3 * 5
+        self.assertEquals(score, 2*3*5)
 
         self.quiz_choose()
 

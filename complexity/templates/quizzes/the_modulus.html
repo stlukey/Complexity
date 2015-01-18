@@ -1,3 +1,28 @@
 {% extends "quiz.html" %}
 
+{% block quiz_instructions %}
+    <ul>
+        <li>When loaded a start button will appear.</li>
+        <li>To begin the quiz, click on the start button.</li>
+    </ul>
+{% endblock %}
 
+{% block quiz_content %}
+    <div class="row" id="quiz-data">
+        <span class="col-xs-6" id="quiz-data-z"></span>
+        <span class="col-xs-6" id="quiz-data-w"></span>
+    </div>
+    <div class="row" id="quiz-answers">
+        <span class="col-xs-6"></span>
+        <span class="col-xs-6"></span>
+    </div>
+    <div class="row" id="quiz-question">
+            <span class="col-xs-6" id="quiz-question-value"></span>
+            <span class="col-xs-6 answer-box">?</span>
+    </div>
+    <div class="row fill" id="quiz-answer-selection">
+            <span class="col-xs-2 answer-box"></span>
+            <span class="col-xs-2 col-xs-offset-3 answer-box"></span>
+            <span class="col-xs-2 col-xs-offset-3 answer-box"></span>
+    </div>
+{% endblock %}

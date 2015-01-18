@@ -11,18 +11,20 @@
 
 class Complexity
     constructor: ->
-        @showNavbar() unless @gtkApp
+        @hideNavbar() if @gtkApp
 
-    # Simply shows the navbar, used when accessed by other web browsers.
-    showNavbar: ->
+    # Simply hides the navbar, used when accessed by app
+    hideNavbar: ->
         $ '.navbar'
-            .removeClass 'hidden'
+            .addClass 'hidden'
 
     # Used to check if accessed by gtk app or browser.
     gtkApp:
         navigator.userAgent == "Complexity Gtk"
 
-    @main: -> new Complexity
+    @main: ->
+      new Complexity
+      console.log "[Complexity] Core init finished,"
 
 $ Complexity.main
 

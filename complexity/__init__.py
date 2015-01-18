@@ -6,7 +6,7 @@
     
     Contains the flask app.
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
 
@@ -26,11 +26,11 @@ from quizzes import register_assets as register_quizzes_assets
 #       time too. Python has a built-in module called 'shelves'
 #       that builds on top of the 'pickle' module allowing for a
 #       layer of abstraction, eliminating the need to manually write
-#       the pickled data to the file. 'flask-shelves' is a
-#       reimplementation of the built-in 'shelves' module for use
-#       with the Flask web framework and provides a locking
-#       mechanism over the pickled data file. Hence, this is why it
-#       is used for storage.
+#       the pickled data (binary data that represents python objects)
+#       to the file. 'flask-shelves' is a reimplementation of the
+#       built-in 'shelves' module for use with the Flask web
+#       framework and provides a locking mechanism over the pickled
+#       data file. Hence, this is why it is used for storage.
 
 # ~~~~ Configuration ~~~~
 
@@ -65,9 +65,11 @@ assets.register(
     'js_all',
     Bundle(
         'jquery/dist/jquery.min.js',
-        'bootstrap/dist/js/bootstrap.min.js',
+        'bootstrap-without-jquery/bootstrap3/bootstrap-without-jquery.js',
+        'zepto/zepto.js',
+        'katex/build/katex.js',
         Bundle(
-            'all.coffee',
+            'complexity.coffee',
             filters=['coffeescript'],
         ),
         output='all.js'
@@ -78,6 +80,7 @@ assets.register(
     'css_all',
     Bundle(
         'all.less',
+        'katex/static/katex.less',
         filters='less',
         output='all.css',
         depends=['**/*.less']

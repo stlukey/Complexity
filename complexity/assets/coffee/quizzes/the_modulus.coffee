@@ -4,45 +4,77 @@
     Complexity: quizzes/the_modulus.coffee
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 ###
 
-# Where to store quiz content.
-$content = $('#quiz-content')
+class QuizPageData
+    content: document.getElementById 'quiz-content'
+    msg: document.getElementById 'quiz-msg'
 
-# Where score is displayed.
-$score = $('#quiz-score-value')
+    msgWait: document.getElementById 'quiz-msg-wait'
+    msgStart:  document.getElementById 'quiz-msg-start'
+
+    _score = document.getElementById 'quiz-score-value'
+
+    _dataZ = document.getElementById 'quiz-data-z'
+    _dataW = document.getElementById 'quiz-data-w'
+    
+    _answers = document.getElementById('quiz-answers')
+
+    _question = document.getElementById 'quiz-question-value'
+    _possibleAnswers = document
+                        .getElementById 'quiz-answer-selection'
+                        .getElementsByClassName 'answer-box'
+
+    Object.defineProperties @prototype,
+        score:
+            set: (value) ->
+                _score.innnerHTML = value
+
+        z:
+            set: (value) ->
+                katex.render "z = #{ value }", _dataZ
+
+        w:
+            set: (value) ->
+                katex.render "w = #{ value }", _dataW
+
+    setQuestionPart: (part, callback) ->
+        [question, answers, correctAnswer] = part
+        katex.render "#{ question } = ", _question
+
+        for i in [0..2]
+            katex.render answers[i], _possibleAnswers[i]
+            _possibleAnswers[i].onclick = -> callback(i)
+
+    setAnswerPart: (part, question, answer) ->
+        katex.render "#{ question } = #{ answer } ", _answers[part]
 
 
 class Quiz
     constructor: (@ID) ->
-        console.log "Quiz ID: #{@ID}"
+        Quiz.log "ID: #{@ID}"
 
-        @question = null
+        @page = new QuizPageData
         @answered = false
+        @getQuestion @showStart
 
-        @getQuestion =>
-            alert @w
 
-    # @score is a property so the displayed score also gets updated
-    # when set.
-    Object.defineProperties @prototype,
-        score:
-            get: -> @_score
-            set: (value) ->
-                @_score = value
-                $score.text value
+    # When the quiz object is ready, ask the user if they wish
+    # to start.
+    showStart: =>
+        @page.wait.style.display = 'none'
+        @page.start.onclick = @startQuiz
+        @page.start.classList.add 'show'
+        @page.start.classList.remove 'hide'
+        Quiz.log "Ready!"
 
-    # Load next question.
-    getQuestion: (callback) ->
-        if @question? and not @answered
-            return callback()
+    startQuiz: ->
+        @page.msg.style.display = 'none'
+        @page.content.classList.add 'show'
+        @page.content.classList.remove 'hide'
 
-        Quiz.get 'next', (json) =>
-            {w:@w, z:@z} = json['data']
-            @question = json['question']
-            callback()
 
     # Get requests to quiz.
     @get: (name, callback) ->
@@ -50,17 +82,26 @@ class Quiz
             .success callback
             .error @showError
 
+    # Log data to console.
+    @log: (options..., msg) ->
+        options.push "Quiz"
+        msg = "[" + option + "] " + msg for option in options
+        console.log msg
+
     # For critical errors.
     @showError: (jqXHR, textStatus, errorThrown) ->
-        console.log "[Error] #{textStatus} #{errorThrown}"
-        $content.empty()
+        Quiz.log  "Error", "#{textStatus} #{errorThrown}"
         
-        $div = $ '<div>', class: "center vcenter error"
-        $h1 = $ '<h1>'
+        page = new QuizPageData
+        page.content.style.display = 'none'
+        page.msg.style.display  = 'none'
+        page.msg.classList.add('hide', 'error')
+        page.msg.innerHTML = ''
+
+        errorText = document.createElement 'h1'
+        errorText.innerHTML = "A critical error occurred!"
         
-        $h1.text "A critical error occured!"
-        $div.append $h1
-        $content.append $div
+        page.msg.appendChild errorText
 
     # Runs when page is loaded.
     @main: ->

@@ -6,7 +6,7 @@
     
     Crypto Secrets.
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
 

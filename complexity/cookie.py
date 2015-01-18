@@ -6,7 +6,7 @@
     
     Cookie Tools.
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    Copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     License: New BSD, see LICENSE for more details.
 """
 

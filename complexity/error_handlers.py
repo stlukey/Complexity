@@ -6,7 +6,7 @@
 
     Handlers for custom exceptions.
 
-    Copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    Copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     License: New BSD, see LICENSE for more details.
 """
 
@@ -16,8 +16,11 @@ from . import app
 from errors import BadRequestError
 
 
-@app.errorhandler(BadRequestError)
+@app.errorhandler(BaseException)
 def handle_base_error(error):
+    """
+    Renders response content for when a custom exception is made.
+    """
     endpoint = request.endpoint.split('.')[-1]
     response = make_response(jsonify(error.to_dict())
                              if endpoint.startswith('_')

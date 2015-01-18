@@ -6,15 +6,17 @@
     
     Contains the views and registers blueprints.
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
+from flask import render_template
 
 from .. import app
 from .quiz import quiz_bp
 
-from flask import render_template
-from ..utils import get_shelve
+# Register error handlers.
+from .. import error_handlers
+
 
 @app.route("/")
 def index():
@@ -23,13 +25,6 @@ def index():
     Just welcomes the user and asks them to start a quiz. 
     """
     return render_template('index.html')
-
-
-# TODO: Remove for release.
-@app.route("/shelve")
-def show_shelve():
-    return str(dict(get_shelve()))
-
 
 # Register blueprints.
 app.register_blueprint(quiz_bp, url_prefix="/quiz")

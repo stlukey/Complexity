@@ -1,3 +1,15 @@
+#!/usr/bin/env python2
+# -*- coding: UTF-8 -*-
+"""
+    Complexity: maths/operands.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Class used to represent maths operands.
+
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
+    :license: New BSD, see LICENSE for more details.
+"""
+
 
 from random import Random
 
@@ -5,6 +17,9 @@ from . import make_brackets
 
 
 class BODMAS(object):
+    """
+    Simple enum like object for representing the order of operations.
+    """
     (
         brackets, order, division, multiplication,
         addition, subtraction
@@ -12,29 +27,67 @@ class BODMAS(object):
 
 
 class MathsOperand(object):
+    """
+    Represents operands in MathExpressions.
+    """
+
     def __init__(self, value=None, order=None):
+        """
+        :param value: The value of the operand.
+        :param order: The order of operations for the operand.
+        """
         self._value = value
         self._order = order
 
     @property
     def enclosed(self):
+        """
+        :returns: True if enclosed in brackets.
+        """
         return self._order == BODMAS.brackets
 
     def requires_brackets(self, order, explicit=True):
+        """
+        Detect if operand needs brackets when used in an expression
+        with `order`.
+
+        :param order: The order (BODMAS value) used by the
+                       expression.
+
+        :param explicit: Used in the case of multiplication to
+                          distinguish between '5x' and '5 * x'.
+
+        :returns: Boolean of if the operand needs brackets when used
+                  in an expression of `order`.
+        """
+        # If it already has brackets it does not need more.
         if self.enclosed:
             return False
 
+        # If it's a constant it needs brackets if used explicitly.
+        # e.g. '(3)(3)' not '33'
         if self._order is None:
             return not explicit
 
+        # Else it just depends if the new order is less.
         return self._order > order
 
     def render(self, **kwargs):
+        """
+        :param kwargs: for inheritance.
+        :returns: `value`
+        """
         return self._value
 
     def render_auto_brackets(self, order, **kwargs):
+        """
+        Combines `render` and `requires_brackets for convenience
+        but does not allow for implicit operations as they require
+        irregular rules.
+        """
         rendered = self.render(**kwargs)
 
+        # Add brackets if needed.
         if self.requires_brackets(order):
             rendered = make_brackets(rendered)
 
@@ -42,6 +95,9 @@ class MathsOperand(object):
 
 
 class MathsConstant(MathsOperand):
+    """
+    Represents constants.
+    """
     def __init__(self, value):
         super(MathsConstant, self).__init__(
             value=value,
@@ -50,6 +106,9 @@ class MathsConstant(MathsOperand):
 
 
 class MathsRandomConstant(MathsConstant):
+    """
+    Represents constants that are required to be random.
+    """
     def __init__(self, start, end, step=1):
         self._start = start
         self._end = end
@@ -79,6 +138,9 @@ class MathsRandomConstant(MathsConstant):
 
 
 class MathsVariable(MathsOperand):
+    """
+    Represents varibles.
+    """
     def __init__(self, value):
         super(MathsVariable, self).__init__(
             value,

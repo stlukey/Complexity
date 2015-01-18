@@ -4,14 +4,16 @@
     Complexity: quizzes/__init__.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 Luke Southam <luke@devthe.com>.
+    Contains the core functions for working with quizzes.
+
+    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
 
 import os
 import uuid
 from pkgutil import iter_modules
-from .. import Bundle
+from ..custom.assets import Bundle
 
 SHELVE_INSTANCE_PREFIX = 'quiz-'
 
@@ -70,7 +72,8 @@ def load_quiz(quiz_module):
     :returns: The `Quiz` class from `quiz_module`.
     """
 
-    # TODO: Load dynamically based on `quiz_modulus`.
+    # TODO: When additional modules exist, load dynamically based on
+    #       `quiz_modulus`.
     from the_modulus import Quiz
 
     return Quiz
@@ -80,6 +83,8 @@ class BaseQuiz(object):
     """
     Base Quiz object that all Quiz objects MUST inherit from.
     """
+    def __init__(self):
+        self.ended = False
 
     @classmethod
     def create_new(cls, shelve):

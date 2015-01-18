@@ -10,19 +10,30 @@
         </div>
 
         <div class"col-md-6">
-            <h2 id="quiz-score pull-right">Score: <span id="quiz-score-int">0</span></h2>
+            <h2 id="quiz-score">Score: <span id="quiz-score-value">0</span></h2>
         </div>
     </div>
 {% endblock %}
 
 {% block content %}
-  <div id="quiz-content">
-    {% block quiz_content %}
-        <div class="center vcenter">
-            <h1>Warming up.....</h1>
+    <div id="quiz-msg">
+        <div clas="row">
+            <span class="col-xs-4 col-xs-offset-1">
+                <h3>Instructions</h3>
+                {% block quiz_instructions %}{% endblock %}
+            </span>
+            <span class="col-xs-4 col-xs-offset-1">
+                <h2 id="quiz-msg-wait">Warming up.....</h2>
+                <a href="#" id="quiz-msg-start" class="btn btn-primary btn-lg" role="button">
+                    Start!
+                </a>
+            </span>
         </div>
-    {% endblock %}
-  </div>
+    </div>
+
+    <div id="quiz-content" class="container fill">
+        {% block quiz_content %}{% endblock %}
+    </div>
 {% endblock %}
 
 {% block js %}
