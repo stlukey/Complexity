@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %} Records for: {{ quiz_name }} {% endblock %}
+
+{% block header %}
+    <div class="row">
+        <span class="col-md-6">
+            <h2 id="quiz-name">Quiz: {{ quiz_name }}</h2>
+        </span>
+        <span class="col-md-6"></span>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for i in records_range %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ records[i][1] }}</td>
+                        <td>{{ records[i][0] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
