@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 """
     Complexity: custom/shelve.py
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Mimics the `flask-shelves` module but adds more advanced
     deserialization through the `dill` package instead of `pickle`

@@ -3,6 +3,7 @@
 ###
     Complexity: quizzes/the_modulus.coffee
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     Client side script for 'the_modulus' quiz.
 
     :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
@@ -14,6 +15,7 @@ class QuizPageData
     Manages page data.
     ###
 
+    # Get elements on page.
     content: document.getElementById 'quiz-content'
     msg: document.getElementById 'quiz-msg'
 
@@ -61,6 +63,9 @@ class QuizPageData
         @setPossibleAnswers answers, callback
 
     setPossibleAnswers: (answers, callback) ->
+        ###
+        Setup possible answers on page.
+        ###
         katex.render answers[0], _possibleAnswers[0]
         _possibleAnswers[0].onclick = -> callback(0)
 
@@ -81,8 +86,8 @@ class QuizPageData
         Flash answer a given color.
         ###
         el = $(_possibleAnswers[answer])
-        el.animate { 'background-color': color }, 250
-        el.animate { 'background-color': 'white' }, 250
+        el.animate { 'background-color': color }, 200
+        el.animate { 'background-color': 'white' }, 200
         el.promise().done callback if callback?
 
     clearAnswers: ->
@@ -107,6 +112,9 @@ class Quiz
         @getQuestion @showStart
 
     getQuestion: (callback) =>
+        ###
+        Get question from server.
+        ###
         Quiz.get 'next', (json) =>
             if json['finish']
                 return @onFinish()
@@ -114,18 +122,24 @@ class Quiz
             @question = json['question']
             @data = json['data']
 
+            # Save z and w
             @page.z = @data['z']
             @page.w = @data['w']
-            
+
+            # Clear page.
             @page.clearAnswers()
             @currentQuestionAnswers = []
 
+            # Setup first part of question.
             @currentPart = @question.shift()
             @lastStartTime = +new Date
             @page.setQuestionPart @currentPart, @onAnswer
             callback() if callback?
 
     onAnswer: (answer) =>
+        ###
+        When a question is answered.
+        ###
         @page.removeAnswerHooks()
 
         timeNow = +new Date
@@ -158,6 +172,9 @@ class Quiz
 
 
     sendAnswers: (callback) =>
+        ###
+        Send answers to server.
+        ###
         data = answer: @currentQuestionAnswers
         Quiz.post 'next', data, (json) =>
             if json['score'] != @page.score
@@ -173,6 +190,9 @@ class Quiz
             callback() if callback?
 
     onSpotted: (callback) ->
+        ###
+        Called when server returns spotted=true.
+        ###
         spotted = confirm("You answered it faster than last time." +
                           "\nCan you show the pattern?")
         
@@ -193,6 +213,9 @@ class Quiz
                 @onSpottedAnswer i, callback
 
     onSpottedAnswer: (i, callback) ->
+        ###
+        When an answer is given for spotted question.
+        ###
         Quiz.post 'next', answer: @currentQuestion[i], (json) =>
             @page.score = json['score']
             $('#quiz-question').show()
@@ -200,8 +223,10 @@ class Quiz
 
             callback() if callback?
 
-
     onFinish: ->
+        ###
+        When the quiz has ended.
+        ###
         name = prompt('Please enter your name:')
         path = $SCRIPT_ROOT + '/quiz/the_modulus/finish'
 
@@ -226,6 +251,9 @@ class Quiz
         Quiz.log "Ready!"
 
     startQuiz: =>
+        ###
+        When the start button is clicked.
+        ###
         $(@page.msg).hide()
         $(@page.content).fadeIn()
 
