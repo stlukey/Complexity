@@ -18,10 +18,16 @@
 <body>
 
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="{{ url_for('index') }}">Complexity</a>
             </div>
+
+            <ul class="nav navbar-nav">
+              <li><a href="{{ url_for('quiz.choose') }}">Quizzes</a></li>
+              <li><a href="{{ url_for('records.choose') }}">Records</a></li>
+            </ul>
+
         </div>
     </nav>
 

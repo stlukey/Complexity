@@ -13,6 +13,7 @@ from flask import render_template
 
 from .. import app
 from .quiz import quiz_bp
+from .records import records_bp
 
 # Register error handlers.
 from .. import error_handlers
@@ -28,3 +29,4 @@ def index():
 
 # Register blueprints.
 app.register_blueprint(quiz_bp, url_prefix="/quiz")
+app.register_blueprint(records_bp, url_prefix="/records")

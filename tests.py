@@ -109,7 +109,7 @@ class ComplexityTestCase(unittest.TestCase):
         # marks for next question.
         resp = self.quiz_next_post(module, dict(answer=CORRECT_PATTERN))
         score = json.loads(resp.data)['score']
-        self.assertEquals(score, 5*3*5 + 5)
+        self.assertEquals(score, 5*3*4 + 5)
 
         self.quiz_choose()
 

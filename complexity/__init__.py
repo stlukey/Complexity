@@ -65,8 +65,8 @@ assets.register(
     'js_all',
     Bundle(
         'jquery/dist/jquery.min.js',
-        'bootstrap-without-jquery/bootstrap3/bootstrap-without-jquery.js',
-        'zepto/zepto.js',
+        'jquery-color/jquery.color.js',
+        'bootstrap/dist/js/bootstrap.min.js',
         'katex/build/katex.js',
         output='all.js'
     )

@@ -2,7 +2,17 @@
 
 {% block quiz_instructions %}
     <ul>
-        <li>When loaded a start button will appear.</li>
+        <li>Each question will define the complex numbers z and w just below the title.</li>
+        <li>Each question consists of three parts.</li>
+        <li>For each part you will be given an expression containing z and w and be asked what it equates to.</li>
+        <li>There will be 3 options for each of these expressions, click the correct one.</li>
+        <li>Answers are rounded down to the closest integer.</li>
+        <li>The correct answer will flash green once clicked.</li>
+        <li>If the server detects you may have detected a pattern, you get the opportunity to bypass additional questions of that type.</li>
+        <li>If you correctly spot the pattern you receive all points for additional questions of that type plus 5 bonus ones.</li>
+        <li>However if you incorrectly spot it those points will be lost.</li>
+        <li>You get the choice to either play on or attempt to select the correct pattern.</li>
+        <li>Once loaded the start button will appear.</li>
         <li>To begin the quiz, click on the start button.</li>
     </ul>
 {% endblock %}
@@ -21,8 +31,8 @@
             <span class="col-xs-6 answer-box">?</span>
     </div>
     <div class="row fill" id="quiz-answer-selection">
-            <span class="col-xs-2 answer-box"></span>
-            <span class="col-xs-2 col-xs-offset-3 answer-box"></span>
-            <span class="col-xs-2 col-xs-offset-3 answer-box"></span>
+            <span class="col-xs-3 answer-box"></span>
+            <span class="col-xs-3 col-xs-offset-1 answer-box"></span>
+            <span class="col-xs-3 col-xs-offset-1 answer-box"></span>
     </div>
 {% endblock %}

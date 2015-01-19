@@ -40,7 +40,6 @@ quizzes = {
 # For reverse lookup.
 quizzes_rev = {v: k for k, v in quizzes.items()}
 
-
 def register_assets(assets):
     """
     Create and register assets for every quiz.

@@ -10,6 +10,7 @@
     :license: New BSD, see LICENSE for more details.
 """
 from functools import wraps
+import bisect
 
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, abort, g, make_response, jsonify,
@@ -227,11 +228,19 @@ def _finish(quiz_module):
     if not quiz.ended:
         raise BadRequestError("Quiz not ended!")
 
-    name = request.form.get('name', None)
     shelve = get_shelve()
 
-    if name is not None:
-        quiz.finish(name, shelve)
+
+    name = request.form.get('name', None)
+    if name:
+        record = quiz.finish(name)
+        quiz_module = str(quiz_module)
+        records = shelve.get(quiz_module, [])
+
+        records.append(record)
+        records.sort(reverse=True)
+        shelve[quiz_module] = records
+
     quiz.remove(shelve)
 
     return redirect(url_for('index'))

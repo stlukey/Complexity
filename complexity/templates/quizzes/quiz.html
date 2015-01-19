@@ -17,12 +17,12 @@
 
 {% block content %}
     <div id="quiz-msg">
-        <div clas="row">
-            <span class="col-xs-4 col-xs-offset-1">
+        <div class="row">
+            <span id="quiz-instructions" class="col-xs-5 col-xs-offset-1">
                 <h3>Instructions</h3>
                 {% block quiz_instructions %}{% endblock %}
             </span>
-            <span class="col-xs-4 col-xs-offset-1">
+            <span class="col-xs-3 col-xs-offset-1">
                 <h2 id="quiz-msg-wait">Warming up.....</h2>
                 <a href="#" id="quiz-msg-start" class="btn btn-primary btn-lg" role="button">
                     Start!

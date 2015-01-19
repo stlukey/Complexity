@@ -11,19 +11,15 @@
 """
 
 import random
-import bisect
 
-from flask import request, redirect, url_for
+from flask import request
 
 from . import BaseQuiz
 from ..maths import *
 from ..maths.complex import (compute_modulus, compute_product,
                              compute_divide)
 from ..errors import BadRequestError
-from ..utils import get_shelve
 
-
-RECORDS = 'quiz-records-the_modulus'
 
 class MultipleChoiceQuestion(object):
     """
@@ -47,6 +43,7 @@ class MultipleChoiceQuestion(object):
     def __init__(self):
         self.answered = False
         self.score = 0
+        self.results = []
 
     @staticmethod
     def _make_part(part):
@@ -105,7 +102,7 @@ class MultipleChoiceQuestion(object):
         :param request_data: A dictionary containing the loaded
                              data from JSON inside the request.
 
-        :returns: The total score for the question.
+        :returns: The total score and results for the question.
         """
         if self.answered:
             raise ValueError
@@ -116,12 +113,17 @@ class MultipleChoiceQuestion(object):
         # Process each part.
         for i in xrange(len(self.parts)):
 
+            correct = answer[i][0] == self._question[i][2]
+
+            # Save result.
+            self.results.append(correct)
+
             # If correct add 5 to the score.
-            if answer[i][0] == self._question[i][2]:
+            if correct:
                 self.score += 5
 
         self.answered = True
-        return self.score
+        return self.score, self.results
 
 
 class ModulusProductQuestion(MultipleChoiceQuestion):
@@ -220,6 +222,8 @@ class ModulusProductQuestion(MultipleChoiceQuestion):
 
             # Compute vars for random number generation.
             step = int(zw_mod_squared.render() * 0.1)
+            if step < 1:
+                step = 1
             start = int(zw_mod_squared.render() - step*10)
             end = int(zw_mod_squared.render() + step*10)
 
@@ -412,14 +416,14 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
 
             # Compute vars for random number generation.
             # For both the real part...
-            step_re = int(self.z_div_w.re * 0.1)
+            step_re = int(self.z_div_w.re)
             if step_re < 1:
                 step_re = 1
             start_re = int(self.z_div_w.re - step_re*10)
             end_re = int(self.z_div_w.re + step_re*10)
 
             # ....and imaginary part.
-            step_im = int(self.z_div_w.im * 0.1)
+            step_im = int(self.z_div_w.im)
             if step_im < 1:
                 step_im = 1
             start_im = int(self.z_div_w.im - step_im*10)
@@ -461,7 +465,9 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
             z_div_w_mod_squared = z_div_w_mod.operands[0]
 
             # Compute vars for random number generation.
-            step = int(z_div_w_mod_squared.render() * 0.1)
+            step = int(z_div_w_mod_squared.render())
+            if step < 1:
+                step = 1
             start = int(z_div_w_mod_squared.render() - step*10)
             end = int(z_div_w_mod_squared.render() + step*10)
 
@@ -523,31 +529,15 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
             )
 
         def answers():
-            # |a + bj| = sqrt(a*a + b*b)
-            z_mod = compute_modulus(self.z)
-            w_mod = compute_modulus(self.w)
-
-            # |a + bj|^2 = a*a + b*b.
-            z_mod_squared = z_mod.operands[0]
-            w_mod_squared = w_mod.operands[0]
-
-            # |a + bj|^2 |c + dj|^2 = (a*a + b*b) / (c*c + d*d)
-            z_mod_squared_div_w_mod_squared = MathsConstant(
-                z_mod_squared.render() / w_mod_squared.render()
-            )
-
-            # |a + bj| / |c + dj| = sqrt[ (a*a + b*b) / (c*c + d*d) ]
-            z_mod_w_mod = MathsExpression(
-                z_mod_squared_div_w_mod_squared,
-                operators.sqrt
-            )
+            correct = self.part_two[1][0]
+            correct_squared = correct.operands[0]
 
             # Compute vars for random numbers.
-            step = int(z_mod_squared_div_w_mod_squared.render() * 0.1)
+            step = int(correct_squared.render())
             if step < 1:
                 step = 1
-            start = int(z_mod_squared_div_w_mod_squared.render() - step*10)
-            end = int(z_mod_squared_div_w_mod_squared.render() + step*10)
+            start = int(correct_squared.render() - step*10)
+            end = int(correct_squared.render() + step*10)
 
             # Generate wrong answers.
             wrong_answers = [
@@ -557,7 +547,7 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
                 ) for _ in xrange(2)
             ]
 
-            return [z_mod_w_mod] + wrong_answers
+            return [correct] + wrong_answers
 
         # Only compute once as the same contents must be returned
         # for the same question instance.
@@ -585,7 +575,7 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
         z_mod_div_w_mod_var = MathsExpression([
             z_mod_var,
             w_mod_var
-        ])
+        ], operators.divide)
         z_div_w_mod_var = MathsExpression(self.z_div_w_var, operators.abs)
 
         # The possible answers
@@ -622,13 +612,14 @@ class Quiz(BaseQuiz):
     The Modulus Quiz.
 
     Contents:
-        ModulusProductQuestion * 5
+        ModulusProductQuestion * 3,
+        ModulusDivisionQuestion * 3
 
     """
     def __init__(self):
         self.questions = [
-            (ModulusProductQuestion, 5),
-            (ModulusDivisionQuestion, 5)
+            (ModulusProductQuestion, 3),
+            (ModulusDivisionQuestion, 3)
         ]
         self.repeat_limit = 0
         self.repeat_count = 0
@@ -641,7 +632,8 @@ class Quiz(BaseQuiz):
         """
         Handle request to '/the_modulus/_next'.
         """
-        if self.question is None:
+        if self.pattern == PatternState.not_spotted and\
+           self.question is None:
             return self.finish()
 
         # Separate GET and POST requests.
@@ -655,7 +647,7 @@ class Quiz(BaseQuiz):
         # Check if there is still a question loaded that has not been
         # answered.
         if hasattr(self, '_question'):
-            if not self._question.answered:
+            if not self._question.answered or self.pattern != PatternState.not_spotted:
                 return self._question
 
         # Check if the current question type is finished or needs to
@@ -685,10 +677,9 @@ class Quiz(BaseQuiz):
         # As error message says below.
         if self.pattern != PatternState.not_spotted:
             raise BadRequestError(
-                "Can't get more questions until the pattern has" +
+                "Can't get more questions until the pattern has " +
                 "been processed."
             )
-
 
         response = self.question.ask()
         response['finish'] = False
@@ -716,6 +707,9 @@ class Quiz(BaseQuiz):
                     len(self.question.parts) * 5
                 )
 
+                if 'answer' not in json:
+                    raise BadRequestError('Expected answer.')
+
                 # If correct they get the points.
                 if self._question.pattern(json['answer']):
                     self.score += score
@@ -738,23 +732,28 @@ class Quiz(BaseQuiz):
 
             # So they don't yet know the pattern.
             self.pattern = PatternState.not_spotted
-            return
+            return {}
 
         # A question must be being answered. If not, something has
         # gone wrong.
         if 'answer' not in json:
             raise BadRequestError('Expected answer.')
 
+        # Answer question.
+        score, results = self.question.answer(json)
+
         # Add the amount scored to the score.
-        self.score += self.question.answer(json)
+        self.score += score
 
         # A pattern may have been spotted if the response time is
         # less than the previous.
         resp_time = json['answer'][-1][1]
-        if self.prev_resp_time is not None:
+        if self.prev_resp_time is not None and results[-1]:
             if resp_time < self.prev_resp_time:
                 self.pattern = PatternState.spotted
-        self.prev_resp_time = resp_time
+
+        # Save previous response time to last question if correct.
+        self.prev_resp_time = resp_time if results[-1] else None
 
         # Return the data.
         return dict(
@@ -762,7 +761,7 @@ class Quiz(BaseQuiz):
             spotted=self.pattern
         )
 
-    def finish(self, name=None, shelve=None):
+    def finish(self, name=None):
         """
         Finish quiz, save scores
         """
@@ -770,15 +769,7 @@ class Quiz(BaseQuiz):
         if name is None:
             return dict(finish=True)
 
-        if shelve is None:
-             raise ValueError
-
-        record = (self.score, json['name'])
-
-        if RECORDS not in shelve:
-            shelve[RECORDS] = []
-
-        bisect.bisect_left(shelve[RECORDS], record)
+        return (self.score, name)
 
 
 

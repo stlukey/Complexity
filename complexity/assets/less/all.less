@@ -1,10 +1,6 @@
 @import "../bower_components/bootstrap/less/bootstrap";
 @import "./variables.less";
 
-.hidden {
-    display: none;
-}
-
 .center {
     text-align: center;
 }
@@ -25,15 +21,9 @@
     color: red
 }
 
-
-.show {
-  transition: opacity 400ms;
+#quiz-instructions > ul {
+    text-align: left;
 }
-
-.hide {
-  opacity: 0;
-}
-
 
 #quiz-msg {
     .center;
@@ -44,22 +34,18 @@
     }
 }
 
-#quiz-msg-start, #quiz-content{
-    display: none;
-}
-
 #quiz-msg-start {
     font-size: 32px;
     padding: 5%;
-    .hide;
+    display: none;
 }
 
 #quiz-content {
-    .hide;
     margin-top: 1%;
     span {
         text-align: center;
     }
+    display: none;
 }
 
 #quiz-data:first-child {
@@ -77,6 +63,10 @@
 
 #quiz-question, #quiz-answer-selection {
     font-size: 24px;
+}
+
+#quiz-answer-selection > .answer-box {
+    cursor: pointer;
 }
 
 .answer-box {
