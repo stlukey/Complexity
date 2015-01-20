@@ -303,7 +303,7 @@ class Quiz
     # Runs when page is loaded.
     @main: ->
         Quiz.get 'new', (json) ->
-            window.quiz = new Quiz json['ID']
+            new Quiz json['ID']
 
 $ Quiz.main
 
