@@ -1,0 +1,17 @@
+language: python
+python:
+  - "2.7"
+  - "pypy"
+install:
+  - npm install bower
+  - npm install coffee
+  - npm install less
+  - npm install browserify
+  - cd complexity/assets
+  - bower install
+  - cd bower_components/katex
+  - make build/katex.js
+  - python -c "import base64,uuid;print 'base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)'"
+  - pip install -e .
+script:
+  - python setup.py test
