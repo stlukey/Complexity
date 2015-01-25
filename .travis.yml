@@ -13,6 +13,7 @@ install:
   - make build/katex.js
   - cd ../../
   - python -c "import base64,uuid;print 'COOKIE_SECRET=' + base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)" > secrets.py
+  - cd ..
   - pip install .
 script:
   - python setup.py test
