@@ -28,7 +28,10 @@ class PyTest(TestCommand):
 
     def run_tests(self):
         import pytest
+        cwd = os.curdir
+        os.chdir('complexity/tests')
         errcode = pytest.main(self.test_args)
+        os.chdir(cwd)
         sys.exit(errcode)
 
 setup(
@@ -46,7 +49,7 @@ setup(
     packages=find_packages(exclude=['fab*', 'tests*']),
     include_package_data=True,
     platforms='any',
-    test_suite='complexity.test',
+    test_suite='complexity.tests',
     extras_require={
         'testing': ['pytest'],
     },

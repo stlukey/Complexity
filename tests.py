@@ -3,7 +3,7 @@
 """
     Complexity: tests
     ~~~~~~~~~~~~~~~~~
- m+
+ 
     Test suite for complexity.
 
     Copyright: (c) 2015 Luke Southam <luke@devthe.com>.
@@ -12,11 +12,12 @@
 import os
 import unittest
 
-from complexity import app
+from complexity import create_app
 from complexity.quizzes import quiz_modules
 
 import json
 
+app = create_app()
 
 class ComplexityTestCase(unittest.TestCase):
     def setUp(self):
