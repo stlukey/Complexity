@@ -13,7 +13,6 @@
 import os
 import uuid
 from pkgutil import iter_modules
-from ..custom.assets import Bundle
 
 SHELVE_INSTANCE_PREFIX = 'quiz-'
 
@@ -39,26 +38,6 @@ quizzes = {
 
 # For reverse lookup.
 quizzes_rev = {v: k for k, v in quizzes.items()}
-
-def register_assets(assets):
-    """
-    Create and register assets for every quiz.
-    (cant relative import assets?)
-
-    :param assets: Flask-Assets Environment.
-    """
-    for module in quiz_modules:
-        assets.register(
-            'quiz-' + module,
-            Bundle(
-                Bundle(
-                    'quizzes/{}.coffee'.format(module),
-                    filters=['coffeescript']
-                ),
-                output='quiz-{}.js'.format(module)
-            )
-        )
-
 
 def load_quiz(quiz_module):
     """

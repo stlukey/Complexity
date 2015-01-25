@@ -16,7 +16,7 @@ from fabric.colors import *
 
 from fab import pip
 
-from complexity import app
+from complexity import create_app
 
 @task
 def pyclean():
@@ -46,6 +46,7 @@ def clean_storage():
 
 @task
 def run(debug=False):
+    app = create_app()
     app.run(debug=debug)
 
 @task

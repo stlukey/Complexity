@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 """
-    Complexity: quiz.py
-    ~~~~~~~~~~~~~~~~~~~
+    Complexity: views/quiz.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Contains the quiz blueprint.
 
@@ -14,9 +14,8 @@ import bisect
 
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, abort, g, make_response, jsonify,
-                   Response)
+                   Response, current_app)
 
-from .. import app
 from ..cookie import Cookie
 from ..utils import get_shelve
 from ..quizzes import quizzes, quizzes_rev, load_quiz, BaseQuiz
@@ -139,7 +138,7 @@ def attempt(quiz_module):
         # Create dictionary of endpoints for client side scripts.
         rule.endpoint[len('quiz._'):]:
             url_for(rule.endpoint, quiz_module=quiz_module)
-            for rule in app.url_map.iter_rules()
+            for rule in current_app.url_map.iter_rules()
             if rule.endpoint.startswith('quiz._')
     }
 

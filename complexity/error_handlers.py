@@ -12,18 +12,39 @@
 
 from flask import jsonify, request, make_response
 
-from . import app
 from errors import BaseError
 
+# A place to store error handlers before they get registered.
+errorhandlers = {}
 
-@app.errorhandler(BaseError)
+def errorhandler(error):
+    """
+    Add error handler.
+    """
+    def wrapper(func):
+        errorhandlers[error] = func
+        return func
+    return wrapper
+
+def register_errorhandlers(app):
+    """
+    Register error handlers.
+    """
+    for error, handler in errorhandlers.iteritems():
+        app.errorhandler(error)(handler)
+
+@errorhandler(BaseError)
 def handle_base_error(error):
     """
     Renders response content for when a custom exception is made.
     """
+    # If the endpoint starts with '_', respond in JSON not HTML.
     endpoint = request.endpoint.split('.')[-1]
     response = make_response(jsonify(error.to_dict())
                              if endpoint.startswith('_')
                              else error.to_html())
+
     response.status_code = error.status_code
     return response
+
+
