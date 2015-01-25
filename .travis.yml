@@ -11,7 +11,7 @@ install:
   - npm install browserify
   - make build/katex.js
   - cd ../../../
-  - python -c "import base64,uuid;print 'COOKIE_SECRET=' + base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)" > secrets.py
+  - python -c "import base64,uuid;print 'COOKIE_SECRET=\'%s\'' % base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)" > secrets.py
   - cd ..
   - pip install -r requirements.txt
   - python setup.py develop
