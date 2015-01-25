@@ -3,9 +3,9 @@ python:
   - "2.7"
   - "pypy"
 install:
-  - npm install bower
-  - npm install coffee
-  - npm install less
+  - npm install -g bower
+  - npm install -g coffee
+  - npm install -g less
   - npm install browserify
   - cd complexity/assets
   - bower install
