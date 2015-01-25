@@ -1,0 +1,5 @@
+include requirements.txt
+include README.md
+include LICENCE
+include complexity/static/.gitignore
+recursive-include complexity/assets *
