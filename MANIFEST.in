@@ -1,5 +1,5 @@
 include requirements.txt
 include README.md
-include LICENCE
+include LICENSE
 include complexity/static/.gitignore
 recursive-include complexity/assets *
