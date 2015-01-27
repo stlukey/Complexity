@@ -17,6 +17,9 @@ from fabric.colors import *
 from fab import pip
 
 from complexity import create_app
+from complexity.command_line import run, debug
+
+map(task, [run, debug])
 
 @task
 def pyclean():
@@ -43,12 +46,3 @@ def clean_storage():
     local('rm -f complexity.bin.lock')
 
     print green("Done cleaning storage.")
-
-@task
-def run(debug=False):
-    app = create_app()
-    app.run(debug=debug)
-
-@task
-def debug():
-    run(True)
