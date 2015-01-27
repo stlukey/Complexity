@@ -5,9 +5,7 @@ python:
   
 before_install:
   # General packages needed for install.
-  - npm install -g bower
-  - npm install -g coffee
-  - npm install -g less
+  - npm install -g bower coffee less
 
 install:
   # Client-side dependencies.
