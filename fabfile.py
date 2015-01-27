@@ -45,7 +45,7 @@ def create_secrets():
     data = "COOKIE_SECRET='%s'\n" % base64.b64encode(
         uuid.uuid4().bytes + uuid.uuid4().bytes
     )
-    with open('complexity/secrets.py') as f:
+    with open('complexity/secrets.py', 'w') as f:
         f.write(data)
 
 @task
