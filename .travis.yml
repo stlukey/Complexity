@@ -10,11 +10,7 @@ install:
   
   - cd complexity/assets
   - bower install
-  
-  - cd bower_components/katex
-  - npm install browserify
-  - make build/katex.js
-  - cd ../../../../
+  - cd ../..
   
   - pip install -r requirements.txt
   
