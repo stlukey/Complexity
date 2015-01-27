@@ -43,7 +43,8 @@ def clean():
 
 @task
 def create_secrets():
-    data = "#!/usr/bin/env python2.7\n"
+    data = "#!/usr/bin/env python2\n"
+    data += "# -*- coding: UTF-8 -*-"
     data += '"""{}"""\n'.format(secrets_doc)
     data += "# NOTE: This file was automatically generated.\n"
     data += "COOKIE_SECRET='{}'\n".format(
