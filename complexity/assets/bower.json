@@ -15,7 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "coffee-script": "~1.8.0",
     "katex": "~0.1.1",
     "bootstrap": "~3.3.1",
     "jquery-color": "~2.1.2"
