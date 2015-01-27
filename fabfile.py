@@ -39,6 +39,14 @@ def clean():
     print green("Done cleaning temporary files!")
 
 @task
+def create_secrets():
+    data = "COOKIE_SECRET='%s'\n" % base64.b64encode(
+        uuid.uuid4().bytes + uuid.uuid4().bytes
+    )
+    with open('complexity/secrets.py') as f:
+        f.write(data)
+
+@task
 def clean_storage():
     print magenta("Cleaning storage...")
 
