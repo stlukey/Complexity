@@ -19,6 +19,7 @@ install:
 before_script:
   # Create secrets.py and install python package.
   - fab create_secrets
+  - cat complexity/secrets.py
   - python setup.py develop
   
 script:
