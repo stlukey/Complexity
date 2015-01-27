@@ -3,20 +3,26 @@ language: python
 python:
   - "2.7"
   
-install:
+before_install:
+  # General packages needed for install.
   - npm install -g bower
   - npm install -g coffee
   - npm install -g less
-  
+
+install:
+  # Client-side dependencies.
   - cd complexity/assets
   - bower install
   - cd ../..
   
+  # Server-side dependencies.
   - pip install -r requirements.txt
   
 before_script:
+  # Create secrets.py and install python package.
   - fab create_secrets
   - python setup.py develop
   
 script:
+  # Runs complexity.tests
   - python setup.py test
