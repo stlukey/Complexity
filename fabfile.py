@@ -20,6 +20,7 @@ from fab import pip
 
 from complexity import create_app
 from complexity.command_line import run, debug
+from complexity._secrets import __doc__ as secrets_doc
 
 map(task, [run, debug])
 
@@ -42,8 +43,13 @@ def clean():
 
 @task
 def create_secrets():
-    data = "COOKIE_SECRET='%s'\n" % base64.b64encode(
-        uuid.uuid4().bytes + uuid.uuid4().bytes
+    data = "#!/usr/bin/env python2.7\n"
+    data += '"""{}"""\n'.format(secrets_doc)
+    data += "# NOTE: This file was automatically generated.\n"
+    data += "COOKIE_SECRET='{}'\n".format(
+        base64.b64encode(
+            uuid.uuid4().bytes + uuid.uuid4().bytes
+        )
     )
     with open('complexity/secrets.py', 'w') as f:
         f.write(data)
