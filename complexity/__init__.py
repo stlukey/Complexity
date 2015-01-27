@@ -1,4 +1,4 @@
-#!/usr/bin/assets python2
+#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 """
     Complexity: Flask app
