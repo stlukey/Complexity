@@ -1,19 +1,26 @@
 language: python
+
 python:
   - "2.7"
+  
 install:
   - npm install -g bower
   - npm install -g coffee
   - npm install -g less
+  
   - cd complexity/assets
   - bower install
+  
   - cd bower_components/katex
   - npm install browserify
   - make build/katex.js
-  - cd ../../../
-  - python -c "import base64,uuid;print 'COOKIE_SECRET=\'%s\'' % base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)" > secrets.py
-  - cd ..
+  - cd ../../../../
+  
   - pip install -r requirements.txt
+  
+before_script:
+  - fab create_secrets
   - python setup.py develop
+  
 script:
   - python setup.py test
