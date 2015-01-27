@@ -10,6 +10,8 @@
     :license: New BSD, see LICENSE for more details.
 """
 import os
+import base64
+import uuid
 
 from fabric.api import task, local
 from fabric.colors import *
