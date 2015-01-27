@@ -4,8 +4,9 @@ python:
   - "2.7"
   
 before_install:
-  # General packages needed for install.
-  - npm install -g bower coffee less
+  # Need bower package manager for installing
+  # client-side dependancies.
+  - npm install -g bower
 
 install:
   # Client-side dependencies.
@@ -14,6 +15,7 @@ install:
   - cd ../..
   
   # Server-side dependencies.
+  - npm install -g coffee less
   - pip install -r requirements.txt
   
 before_script:
