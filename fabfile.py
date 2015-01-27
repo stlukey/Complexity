@@ -43,20 +43,19 @@ def clean():
 
 @task
 def create_secrets():
+    cookie_secret = base64.b64encode(
+        uuid.uuid4().bytes + uuid.uuid4().bytes
+    )
+        
     with open('complexity/secrets.py', 'w') as f:
-        f.write("#!/usr/bin/env python2\n")
-        f.write("# -*- coding: UTF-8 -*-\n")
-        
-        f.write('"""{}"""\n'.format(secrets_doc))
-        
-        f.write("# NOTE: This file was automatically generated.\n")
-        f.write(
-            "COOKIE_SECRET='{}'\n".format(
-                base64.b64encode(
-                    uuid.uuid4().bytes + uuid.uuid4().bytes
-                )
-            )
-        )
+        f.write("""#!/usr/bin/env python2
+# -*- coding: UTF-8 -*-
+\"\"\"
+{}
+\"\"\"
+# NOTE: This file was automatically generated.
+COOKIE_SECRET='{}'
+""".format(secrets_doc, cookie_secret))
 
 @task
 def clean_storage():
