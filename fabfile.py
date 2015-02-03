@@ -19,10 +19,16 @@ from fabric.colors import *
 from fab import pip
 
 from complexity import create_app
-from complexity.command_line import run, debug
+from complexity import command_line
 from complexity._secrets import __doc__ as secrets_doc
 
-map(task, [run, debug])
+@task
+def run():
+    command_line.run()
+
+@task
+def debug():
+    command_line.debug()
 
 @task
 def pyclean():
@@ -33,11 +39,10 @@ def pyclean():
 
 @task
 def clean():
+    clean_storage()
     print magenta("Cleaning all temporary files...")
     pyclean()
     local('find . -type d -name ".*.swp" -delete')
-
-    local('rm complexity.bin.lock')
 
     print green("Done cleaning temporary files!")
 

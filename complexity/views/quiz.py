@@ -242,6 +242,6 @@ def _finish(quiz_module):
 
     quiz.remove(shelve)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('root.index'))
 
 

@@ -76,7 +76,7 @@ def compute_modulus(z):
     :return: |z| in terms of MathsExpression square root.
     """
     #  z  = a + bj
-    a, b = z.im, z.re
+    a, b = z.re, z.im
 
     # |z| = sqrt(a*a + b*b)
     return MathsExpression(

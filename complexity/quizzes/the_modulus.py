@@ -703,7 +703,7 @@ class Quiz(BaseQuiz):
                 # If correct they get all the remaining points plus
                 # an additional 5.
                 score = 5 + (
-                    (self.repeat_limit - self.repeat_count + 1) *
+                    (self.repeat_limit - self.repeat_count) *
                     len(self.question.parts) * 5
                 )
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    complexity: tests/quizzes/the_modulus.py
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    complexity: tests/views/quizzes/test_the_modulus.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
@@ -81,10 +81,10 @@ def test_product_all_correct(test_client):
     ).data)['score']
 
     # Each question has three parts and each part has 5 points.
-    # Each type of question gets repeated 4 times with random content
+    # Each type of question gets repeated 3 times with random content
     # each time. If the pattern gets spotted all the points are given
     # (5*3*4) plus 5 extra.
-    assert score == 5*3*4 +5
+    assert score == 5*3*3 +5
 
 def test_product_not_spotted(test_client):
     """
@@ -112,6 +112,41 @@ def test_product_not_spotted(test_client):
     ).data)['score']
 
     # The user should not be awarded the points.
-    assert score != 5*3*4 +5
+    assert score != 5*3*3 +5
 
+def test_erroneous_answers(test_client):
+    """
+    Test for when a erroneous index is provided in an answer.
+    """
+    # Create a new quiz instance.
+    quiz.new(test_client)
+
+    # Answer question with erroneous index for the answers.
+    quiz.next(test_client)
+    answer = [(99, 99)] * 3
+    resp = quiz.next(test_client, dict(answer=answer))
+
+    # The server should process the answer as normal but not
+    # award any points.
+    assert resp.status == '200 OK'
+
+
+def test_extreme_answers(test_client):
+    """
+    Test for when the extreme answer index are provided.
+    """
+    # Create a new quiz instance.
+    quiz.new(test_client)
+
+    # Test for 0 index.
+    quiz.next(test_client)
+    answer = [(0, 9)] * 3
+    resp = quiz.next(test_client, dict(answer=answer))
+    assert resp.status == '200 OK'
+
+    # Test for 2 index.
+    quiz.next(test_client)
+    answer = [(2, 9)] * 3
+    resp = quiz.next(test_client, dict(answer=answer))
+    assert resp.status == '200 OK'
 

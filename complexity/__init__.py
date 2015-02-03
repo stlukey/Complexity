@@ -91,7 +91,7 @@ def setup_assets(assets):
             'jquery/dist/jquery.min.js',
             'jquery-color/jquery.color.js',
             'bootstrap/dist/js/bootstrap.min.js',
-            'katex/katex.js',
+            'katex/build/katex.js',
             output='all.js'
         )
     )

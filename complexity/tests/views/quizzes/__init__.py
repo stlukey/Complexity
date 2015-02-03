@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    Complexity: tests/quizzes/__init__.py
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Complexity: tests/views/quizzes/__init__.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
@@ -92,5 +92,28 @@ class Quiz(object):
             (answer_selector(i), response_times[i])
             for i in xrange(3)
         ])
-        assert score == 3*5
+
+    def answer_incorrect(self, test_client, *response_times):
+        """
+        Answer question with incorrect answers and with the given
+        response times.
+        """
+        # Select the first incorrect answer.
+        def answer_selector(i):
+            def func(question):
+                correct = question[i][2]
+                return (correct + 1) % 3
+
+        return self.answer(test_client, [
+            (answer_selector(i), response_times[i])
+            for i in xrange(3)
+        ])
+
+    def finish(self, test_client, name):
+        self.next(test_client)
+        url = "/quiz/{}/finish".format(self.module)
+        return test_client.post(
+            url,
+            data=dict(name=name),
+        )
 
