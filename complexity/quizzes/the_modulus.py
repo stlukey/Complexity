@@ -18,6 +18,8 @@ from ..maths.complex import (compute_modulus, compute_product,
                              compute_divide)
 from ..errors import BadRequestError
 
+class DuplicateAnswerError(Exception):
+    pass
 
 class MultipleChoiceQuestion(object):
     """
@@ -43,6 +45,13 @@ class MultipleChoiceQuestion(object):
         self.score = 0
         self.results = []
 
+        # Cache Question.
+        try:
+            self.question
+        except DuplicateAnswerError:
+            self.__dict__ = {}
+            self.__init__()
+
     @staticmethod
     def _make_part(part):
         """
@@ -61,6 +70,9 @@ class MultipleChoiceQuestion(object):
         question = question.render()
         # Render the possible answers.
         answers = map(lambda expr: str(expr.render()), answers)
+
+        if len(answers) != len(set(answers)):
+            raise DuplicateAnswerError
 
         # Take out the correct answer.
         correct_answer = answers.pop(0)
@@ -399,7 +411,10 @@ class ModulusDivisionQuestion(MultipleChoiceQuestion):
         self.parts = [self.part_one, self.part_two, self.part_three]
 
         # Call the inherited class's __init__
-        super(ModulusDivisionQuestion, self).__init__(*args, **kwargs)
+        super(
+            ModulusDivisionQuestion,
+            self
+        ).__init__(*args, **kwargs)
 
     @property
     def part_one(self):
