@@ -4,10 +4,8 @@
     Complexity: maths/__init__.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    Classes used to represent maths expressions.
+    Represent maths expressions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 

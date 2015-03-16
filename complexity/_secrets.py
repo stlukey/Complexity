@@ -6,8 +6,6 @@
     
     Crypto Secrets.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 # NOTE: This file is a template for secrets.py

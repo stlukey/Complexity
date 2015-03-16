@@ -4,10 +4,8 @@
     Complexity: errors.py
     ~~~~~~~~~~~~~~~~~~~~~
 
-    Contains custom exceptions.
+    Custom exceptions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 
@@ -81,3 +79,4 @@ class BadRequestError(BaseError):
                         the request was wrong.
         """
         self.message = message
+

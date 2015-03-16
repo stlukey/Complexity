@@ -6,8 +6,6 @@
 
     Class used to represent maths expressions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import collections
@@ -22,17 +20,16 @@ class MathsExpression(MathsOperand):
 
     :ivar operator: The expressions MathsOperator.
     :ivar operands: A list of (or children of) MathsOperand objects.
+
+
+    :param operands: Either an iterable type (e.g. a list)
+                     containing, or a single, MathOperand
+                     (or child class of MathOperand) object(s).
+
+    :param operator: A Maths Operator Object.
     """
 
     def __init__(self, operands, operator=operators.multiply):
-        """
-        :param operands: Either an iterable type (e.g. a list)
-                          containing, or a single, MathOperand
-                          (or child class of MathOperand) object(s).
-
-        :param operator: A Maths Operator Object.
-        """
-
         # If its a single instance turn it into a list.
         if isinstance(operands, MathsOperand):
             operands = [operands]

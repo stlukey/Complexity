@@ -1,13 +1,11 @@
 #!/usr/bin/assets python2
 # -*- coding: UTF-8 -*-
 """
-    Complexity: Flask views.
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    Complexity: views/__init__.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    Registers blueprints.
+    Views for the application grouped by blueprint.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 from .root import root_bp
 from .quiz import quiz_bp

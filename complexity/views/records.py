@@ -4,10 +4,8 @@
     Complexity: views/records.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Contains the records blueprint.
+    The records blueprint and view functions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 from flask import (Blueprint, redirect, url_for, request,
@@ -24,7 +22,7 @@ records_bp = Blueprint(
 @records_bp.route('/')
 def choose():
     """
-    Get user to choose which quiz.
+    Get the user to choose which quiz.
 
     :returns: An HTML page with a form, then redirects them to the
               correct quiz's record page once the form is submitted.
@@ -49,7 +47,7 @@ def view(quiz_module):
     :param quiz_module: The name of the module in the `quizzes`
                         package where the `Quiz` class exists.
 
-    :returns the quiz's records page.
+    :returns: The quiz's records page.
 
     :raises abort(404): When the requested `quiz_module` does not
                         exist.
@@ -69,3 +67,4 @@ def view(quiz_module):
     quiz_name = quizzes_rev[quiz_module]
 
     return render_template("view.html", **locals())
+

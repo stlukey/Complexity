@@ -8,8 +8,6 @@
     because `flask-assets` prevents `OPTIONS` being past to
     the filters in `webassets`.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import sys

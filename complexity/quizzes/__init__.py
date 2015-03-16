@@ -4,10 +4,8 @@
     Complexity: quizzes/__init__.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Contains the core functions for working with quizzes.
+    The core functions for working with quizzes.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import os

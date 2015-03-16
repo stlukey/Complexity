@@ -7,6 +7,4 @@
     This package contains a few wrappers around third party packages
     to fix bugs.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """

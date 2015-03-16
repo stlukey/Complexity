@@ -7,8 +7,6 @@
     Classes and functions used to represent and operate on
     complex numbers.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 from .expression import MathsExpression
@@ -25,12 +23,11 @@ class MathsImaginaryNumber(MathsExpression):
 
         MathsConstant(8) * MathsVariable('j')
 
+
+    :param im: A `MathsOperator` (or child class) object for the
+               imaginary part.
     """
     def __init__(self, im):
-        """
-        :param im: A `MathsOperator` (or child class) object for the
-                    imaginary part.
-        """
         super(MathsImaginaryNumber, self).__init__([
             im,
             MathsVariable(IMAGINARY_NOTATION)
@@ -46,17 +43,16 @@ class MathsComplexNumber(MathsExpression):
 
         MathsConstant(2) + (MathsConstant(8) * MathsVariable('j'))
 
+
+    :param re: A `MathsOperator` (or child class) object for the
+               real part.
+
+    :param im: A `MathsOperator` (or child class) object for the
+               imaginary part.
+
+    :param kwargs: Options for rendering.
     """
     def __init__(self, re, im, **kwargs):
-        """
-        :param re: A `MathsOperator` (or child class) object for the
-                    real part.
-
-        :param im: A `MathsOperator` (or child class) object for the
-                    imaginary part.
-
-        :param kwargs: Options for rendering.
-        """
         self.re = re.render(**kwargs)
         self.im = im.render(**kwargs)
         super(MathsComplexNumber, self).__init__(

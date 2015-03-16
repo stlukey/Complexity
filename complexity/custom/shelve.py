@@ -8,8 +8,6 @@
     deserialization through the `dill` package instead of `pickle`
     allowing almost any type of object to be stored.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import sys

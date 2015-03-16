@@ -6,8 +6,6 @@
 
     Class used to represent maths operators.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 from . import DEFAULT_FORMAT, make_brackets
@@ -17,6 +15,9 @@ from .operands import MathsOperand, BODMAS
 class MathsOperator(object):
     """
     Class for math operators.
+
+    :param order: The order (BODMAS value).
+    :param formats: functions named by format for rendering.
     """
 
     @classmethod
@@ -64,10 +65,6 @@ class MathsOperator(object):
         return func
 
     def __init__(self, order, **formats):
-        """
-        :param order: The order (BODMAS value).
-        :param formats: functions named by format for rendering.
-        """
         self.order = order
         self._formats = formats
 

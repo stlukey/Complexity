@@ -6,8 +6,6 @@
 
     Contains a quiz implementation (`Quiz`) for the modulus topic.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import random
@@ -741,8 +739,6 @@ class Quiz(BaseQuiz):
 
         # Answer question.
         score, results = self.question.answer(json)
-
-        # Add the amount scored to the score.
         self.score += score
 
         # A pattern may have been spotted if the response time is
@@ -755,7 +751,6 @@ class Quiz(BaseQuiz):
         # Save previous response time to last question if correct.
         self.prev_resp_time = resp_time if results[-1] else None
 
-        # Return the data.
         return dict(
             score=self.score,
             spotted=self.pattern

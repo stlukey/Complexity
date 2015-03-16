@@ -4,10 +4,8 @@
     Complexity: views/root.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    Contains the root blueprints.
+    The root blueprint and view functions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 from flask import Blueprint, render_template
 

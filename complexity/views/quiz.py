@@ -4,10 +4,8 @@
     Complexity: views/quiz.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    Contains the quiz blueprint.
+    The quiz blueprint and view functions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 from functools import wraps
 import bisect
@@ -31,9 +29,9 @@ quiz_bp = Blueprint(
 
 def quiz_cookie_manage(response):
     """
-    Manages quiz instances set at g.quiz_id
+    Manage cookie quiz instances based on `g.quiz_id`.
 
-    Used by controllers with @after_request.
+    :param response: The response object.
     """
     quiz_req = Cookie(request.cookies.get(COOKIE_QUIZ), False).data
 
@@ -74,7 +72,10 @@ def quiz_cookie_manage(response):
 
 def quiz_cookie(func):
     """
-    Runs quiz_cookie_manage on response object after request.
+    A decorator that runs quiz_cookie_manage on the response object
+    after the given view function has been executed.
+
+    :param func: The view function.
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -93,9 +94,9 @@ def quiz_cookie(func):
 @quiz_cookie
 def choose():
     """
-    Get user to choose which quiz.
+    Get the user to choose which quiz.
 
-    :returns: An HTML page with a form, then redirects them to the
+    :returns: A HTML page with a form, then redirects them to the
               correct quiz's page once the form is submitted.
     """
     # Ask user which quiz.
@@ -115,12 +116,13 @@ def choose():
 @quiz_cookie
 def attempt(quiz_module):
     """
-    Attempt the quiz.
+    Render the page needed for the user to attempt the quiz with
+    `quiz_module`.
 
     :param quiz_module: The name of the module in the `quizzes`
                         package where the `Quiz` class exists.
 
-    :returns the HTML page for the quiz.
+    :returns: The HTML page for the quiz.
 
     :raises abort(404): When the requested `quiz_module` does not
                         exist.
@@ -145,15 +147,13 @@ def attempt(quiz_module):
     return render_template("%s.html" % quiz_module, **template_vars)
 
 # NOTE: Endpoints used by client side scripts begin with a '_'
-
-
 @quiz_bp.route("/<quiz_module>/_new")
 @quiz_cookie
 def _new(quiz_module):
     """
-    Create a new quiz instance.
+    Create a new quiz instance and attaches it to a cookie.
 
-    Used by client side code to get a quiz instance.
+    Used by client side code to get a new quiz instance.
 
     :param quiz_module: The name of the module in the `quizzes`
                         package where the `Quiz` class exists.
@@ -178,7 +178,50 @@ def _new(quiz_module):
 @quiz_cookie
 def _next(quiz_module):
     """
-    Answer/Ask next question.
+    Answer/Ask next question
+    
+    Used by client side code to receive and respond to questions.
+
+    On a valid GET request the response is in the format::
+
+        {
+            'finish': boolean, # Reflects if the quiz has finished.
+
+            'data': quiz_data, # Data such as `x = 1` needed to
+                               # answer questions. The format of
+                               # this is specific to each quiz's
+                               # implementation.
+
+            'question': quiz_question
+                               # The actual question, it usually
+                               # consists of multiple parts. However
+                               # again, the format of this is
+                               # specific to each quiz's
+                               # implementation.
+        }
+
+    
+    A POST request is used to answer the question. The answer is
+    stored under the key 'answer' in the request data. The response
+    format to this depends greatly on the quiz's implementation and
+    where in the quiz the user is. A typical request will return
+    none or more of the following keys/values::
+
+        {
+            'score': score,    # The user's current score.
+
+            'spotted': pattern_spotted,
+                               # If there is a pattern to spot has
+                               # the user spotted it?
+
+            'patterns': possible_patterns,
+                               # Possible patterns for the user to
+                               # attempt to select the correct
+                               # pattern from once they believe they
+                               # may have spotted it.
+
+        }
+
 
     :param quiz_module: The name of the module in the `quizzes`
                         package where the `Quiz` class exists.
@@ -213,7 +256,16 @@ def _next(quiz_module):
 @quiz_cookie
 def _finish(quiz_module):
     """
-    Finish quiz.
+    Finish the quiz storing the score with the name given in
+    `request.form['name']`.
+
+    Used by client side code once a GET request to `_next` returns
+    `{ 'finish': True, ... }`.
+
+    :param quiz_module: The name of the module in the `quizzes`
+                        package where the `Quiz` class exists.
+    
+    :raises BadRequestError:
     """
     # Check the quiz exists.
     if quiz_module not in quizzes.values():

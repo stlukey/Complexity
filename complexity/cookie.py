@@ -6,8 +6,6 @@
     
     Cookie Tools.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 import hmac
@@ -56,6 +54,9 @@ class Cookie(object):
 
     @property
     def hash(self):
+        """
+        Maps `self.data` to a string using the `SECRET`.
+        """
         if self.data is None:
             return
 
@@ -68,6 +69,10 @@ class Cookie(object):
 
     @property
     def value(self):
+        """
+        Return the cookie's string representation but only if it
+        contains data.
+        """
         if self.data is not None:
             return "%s|%s" % (self.data, self.hash)
 

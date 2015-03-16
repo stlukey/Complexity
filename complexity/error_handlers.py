@@ -6,8 +6,6 @@
 
     Handlers for custom exceptions.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 from flask import jsonify, request, make_response
@@ -20,6 +18,8 @@ errorhandlers = {}
 def errorhandler(error):
     """
     Add error handler.
+
+    :param error: The error class.
     """
     def wrapper(func):
         errorhandlers[error] = func
@@ -29,6 +29,8 @@ def errorhandler(error):
 def register_errorhandlers(app):
     """
     Register error handlers.
+
+    :param app: The application's instance.
     """
     for error, handler in errorhandlers.iteritems():
         app.errorhandler(error)(handler)
@@ -37,6 +39,8 @@ def register_errorhandlers(app):
 def handle_base_error(error):
     """
     Renders response content for when a custom exception is made.
+
+    :param error: The error instance.
     """
     # If the endpoint starts with '_', respond in JSON not HTML.
     endpoint = request.endpoint.split('.')[-1]

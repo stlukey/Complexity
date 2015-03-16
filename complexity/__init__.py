@@ -1,12 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 """
-    Complexity: Flask app
-    ~~~~~~~~~~~~~~~~~~~~~
+    Complexity: __init__.py
+    ~~~~~~~~~~~~~~~~~~~~~~~
     
-    Sets up the flask app.
+    Default application config and functions for application
+    instance creation.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
+    :copyright: © 2015 Luke Southam <luke@devthe.com>.
     :license: New BSD, see LICENSE for more details.
 """
 
@@ -46,11 +47,13 @@ ASSETS_PATH = os.path.join(os.path.dirname(__file__), 'assets')
 
 def create_app(**config):
     """
-    Creates the application object.
+    Create the application object.
     
     This is moved into a function, instead of creating the object at
     import time, so that multiple instances can be created. This
     is mainly needed for testing.
+    
+    :param \**config: Additional config.
     """
 
     # Flask app instance.
@@ -75,7 +78,9 @@ def create_app(**config):
 
 def setup_assets(assets):
     """
-    Sets up assets (client-side scripts and styling). 
+    Set up assets (client-side scripts and styling). 
+
+    :param assets: The assets environment instance.
     """
 
     # Define paths to look in for files.

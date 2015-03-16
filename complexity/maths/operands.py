@@ -6,8 +6,6 @@
 
     Class used to represent maths operands.
 
-    :copyright: (c) 2015 Luke Southam <luke@devthe.com>.
-    :license: New BSD, see LICENSE for more details.
 """
 
 
@@ -29,13 +27,12 @@ class BODMAS(object):
 class MathsOperand(object):
     """
     Represents operands in MathExpressions.
+
+    :param value: The value of the operand.
+    :param order: The order of operations for the operand.
     """
 
     def __init__(self, value=None, order=None):
-        """
-        :param value: The value of the operand.
-        :param order: The order of operations for the operand.
-        """
         self._value = value
         self._order = order
 
