@@ -3,3 +3,4 @@ include README.md
 include LICENSE
 include complexity/static/.gitignore
 recursive-include complexity/assets *
+recursive-include complexity/templates *
